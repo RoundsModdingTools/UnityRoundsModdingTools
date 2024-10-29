@@ -1,0 +1,44 @@
+name: Bug report
+description: Create a bug report.
+title: 'Bug Report: '
+labels: [bug]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Describe the Bug
+        Please provide a clear and concise description of the bug you encountered. Include details such as:
+        - What happened?
+        - When did it happen?
+        - Where in the tool or application did you experience it?
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce_steps
+    attributes:
+      label: Steps to Reproduce
+      description: Describe the steps to reproduce the bug (e.g., "1. Go to '...' 2. Click on '...'").
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: Describe what you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Provide any other relevant information about the issue.
