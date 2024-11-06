@@ -38,3 +38,5 @@ MonoBehaviour:
     FolderName: Libraries
   - AssemblyName: ILGenerator
     FolderName: Libraries
+  - AssemblyName: UnityRoundsModdingTools.Editor
+    FolderName: UnityRoundsModdingTools

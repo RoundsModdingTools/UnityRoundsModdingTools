@@ -19,7 +19,8 @@ namespace UnityRoundsModdingTools.ScriptableObjects {
             new FolderMapping("RoundsWithFriends", "Libraries"),
             new FolderMapping("UnboundLib", "Libraries"),
             new FolderMapping("WillsWackyManagers", "Libraries"),
-            new FolderMapping("ILGenerator", "Libraries")
+            new FolderMapping("ILGenerator", "Libraries"),
+            new FolderMapping("UnityRoundsModdingTools.Editor", "UnityRoundsModdingTools"),
         };
 
         public List<string> GetFolderNames() {
