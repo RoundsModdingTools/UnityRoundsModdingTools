@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityRoundsModdingTools.ScriptableObjects;
-using UnityRoundsModdingTools.Utils;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.Utils;
 
-namespace UnityRoundsModdingTools.Windows {
+namespace UnityRoundsModdingTools.Editor.Windows {
     public class InstallModWindow : EditorWindow {
         private string selectedSolutionPath;
 

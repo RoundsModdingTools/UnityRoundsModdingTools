@@ -1,16 +1,16 @@
 ﻿using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using UnityRoundsModdingTools.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
-namespace UnityRoundsModdingTools.CustomInspector {
+namespace UnityRoundsModdingTools.Editor.CustomInspector {
     [CustomEditor(typeof(ProjectMappings))]
-    public class ProjectMappingsInspetor : Editor {
+    public class ProjectMappingsInspetor : UnityEditor.Editor {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
             if(GUILayout.Button("Recompile")) {
-                var editorAssembly = Assembly.GetAssembly(typeof(Editor));
+                var editorAssembly = Assembly.GetAssembly(typeof(UnityEditor.Editor));
                 var editorCompilationInterfaceType = editorAssembly.GetType("UnityEditor.Scripting.ScriptCompilation.EditorCompilationInterface");
                 var dirtyAllScriptsMethod = editorCompilationInterfaceType.GetMethod("DirtyAllScripts", BindingFlags.Static | BindingFlags.Public);
                 dirtyAllScriptsMethod.Invoke(editorCompilationInterfaceType, null);

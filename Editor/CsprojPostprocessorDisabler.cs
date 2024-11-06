@@ -2,7 +2,7 @@
 using System.Text;
 using UnityEditor;
 
-namespace UnityRoundsModdingTools.AssetPostprocessors {
+namespace UnityRoundsModdingTools.Editor.AssetPostprocessors {
     [InitializeOnLoad]
     internal static class CsprojPostprocessorDisabler {
         static CsprojPostprocessorDisabler() {

@@ -2,12 +2,12 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using UnityRoundsModdingTools.ScriptableObjects;
-using UnityRoundsModdingTools.Thunderstore.API;
-using UnityRoundsModdingTools.Thunderstore.API.Entities;
-using UnityRoundsModdingTools.Utils;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.Thunderstore.API;
+using UnityRoundsModdingTools.Editor.Thunderstore.API.Entities;
+using UnityRoundsModdingTools.Editor.Utils;
 
-namespace UnityRoundsModdingTools.Windows {
+namespace UnityRoundsModdingTools.Editor.Windows {
     public class ThunderstoreWindow : EditorWindow {
         private static ThunderstoreAPI thunderstoreAPI = new ThunderstoreAPI();
         private static List<Package> packages = new List<Package>();

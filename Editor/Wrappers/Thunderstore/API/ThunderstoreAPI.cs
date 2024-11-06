@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
-using UnityRoundsModdingTools.Thunderstore.API.Entities;
+using UnityRoundsModdingTools.Editor.Thunderstore.API.Entities;
 
-namespace UnityRoundsModdingTools.Thunderstore.API {
+namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
     public class ThunderstoreAPI {
         public List<Package> GetPackages(string community) {
             UnityEngine.Debug.Log("Fetching packages from Thunderstore...");

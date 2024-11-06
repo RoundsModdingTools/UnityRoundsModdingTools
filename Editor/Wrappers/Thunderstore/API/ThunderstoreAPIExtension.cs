@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityRoundsModdingTools.Thunderstore.API.Entities;
+using UnityRoundsModdingTools.Editor.Thunderstore.API.Entities;
 
-namespace UnityRoundsModdingTools.Thunderstore.API {
+namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
     public enum PackageSortType {
         LastUpdated,
         Newest,

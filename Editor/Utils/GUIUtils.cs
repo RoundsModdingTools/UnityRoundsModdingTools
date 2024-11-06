@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace UnityRoundsModdingTools.Utils {
+namespace UnityRoundsModdingTools.Editor.Utils {
     public class GUIUtils {
         private static Dictionary<int, Vector2> _scrollPositions = new Dictionary<int, Vector2>();
 

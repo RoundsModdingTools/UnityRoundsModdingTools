@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace UnityRoundsModdingTools.ScriptableObjects {
+namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     public abstract class ScriptableSingleton<T> : ScriptableObject where T : ScriptableObject {
         private static T instance;
 

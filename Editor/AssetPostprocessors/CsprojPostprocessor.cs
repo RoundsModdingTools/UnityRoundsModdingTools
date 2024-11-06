@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityRoundsModdingTools.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
-namespace UnityRoundsModdingTools.AssetPostprocessors {
+namespace UnityRoundsModdingTools.Editor.AssetPostprocessors {
     internal class CsprojPostprocessor : AssetPostprocessor {
         private static List<ProjectMapping> ModBundleMap => ProjectMappings.Instance.projectMappings;
 

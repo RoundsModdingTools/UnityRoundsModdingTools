@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace UnityRoundsModdingTools.Thunderstore.API.Entities {
+namespace UnityRoundsModdingTools.Editor.Thunderstore.API.Entities {
     public struct Package {
         [JsonProperty("name")] public string Name { get; set; }
         [JsonProperty("full_name")] public string FullName { get; set; }

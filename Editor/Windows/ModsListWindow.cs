@@ -6,10 +6,10 @@ using System.Text;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using UnityRoundsModdingTools.ScriptableObjects;
-using UnityRoundsModdingTools.Utils;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.Utils;
 
-namespace UnityRoundsModdingTools.Windows {
+namespace UnityRoundsModdingTools.Editor.Windows {
     public class ModsListWindow : EditorWindow {
         private Dictionary<string, bool> selectedMods = new Dictionary<string, bool>();
 

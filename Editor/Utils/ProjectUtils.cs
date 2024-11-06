@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace UnityRoundsModdingTools.Utils {
+namespace UnityRoundsModdingTools.Editor.Utils {
     public class ProjectUtils {
         public static List<string> ConvertToUnityProject(string directoryPath, bool refresh = true) {
             List<string> csprojFiles = Directory.GetFiles(directoryPath, "*.csproj", SearchOption.AllDirectories).ToList();

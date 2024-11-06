@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace UnityRoundsModdingTools.Windows {
+namespace UnityRoundsModdingTools.Editor.Windows {
     public class LoadAssetBundleWindow : EditorWindow {
         private DefaultAsset selectedAssetBundle;
         private AssetBundle loadedAssetBundle;

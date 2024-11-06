@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityRoundsModdingTools.ScriptableObjects {
+namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     [CreateAssetMenu(fileName = "ProjectMapping", menuName = "Unity Rounds Modding Tools/Project Mapping", order = 0)]
     public class ProjectMappings : ScriptableSingleton<ProjectMappings> {
         public List<ProjectMapping> projectMappings;

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityRoundsModdingTools.ScriptableObjects {
+namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     [CreateAssetMenu(fileName = "Settings", menuName = "Unity Rounds Modding Tools/Settings", order = 0)]
     internal class Settings : ScriptableSingleton<Settings> {
         [Header("Settings for Modding Tools")]

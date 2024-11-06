@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
-using UnityRoundsModdingTools.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
-namespace UnityRoundsModdingTools.Utils {
+namespace UnityRoundsModdingTools.Editor.Utils {
     public static class GithubUtils {
         private static Settings Settings => Settings.Instance;
 

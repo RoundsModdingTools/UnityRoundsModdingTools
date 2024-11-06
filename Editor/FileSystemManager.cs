@@ -1,8 +1,8 @@
 using System.IO;
 using UnityEngine;
-using UnityRoundsModdingTools.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
-namespace UnityRoundsModdingTools {
+namespace UnityRoundsModdingTools.Editor {
     public static class FileSystemManager {
         private static Settings Settings => Settings.Instance;
 
