@@ -5,7 +5,7 @@ using UnityEngine;
 namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     [CreateAssetMenu(fileName = "ProjectMapping", menuName = "Unity Rounds Modding Tools/Project Mapping", order = 0)]
     public class ProjectMappings : ScriptableSingleton<ProjectMappings> {
-        public List<ProjectMapping> projectMappings;
+        public List<ProjectMapping> projectMappings = new List<ProjectMapping>();
 
         public List<FolderMapping> folderMappings = new List<FolderMapping>() {
             new FolderMapping("CardChoiceSpawnUniqueCardPatch", "Libraries"),
