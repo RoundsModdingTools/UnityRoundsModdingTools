@@ -38,5 +38,3 @@ MonoBehaviour:
     FolderName: Libraries
   - AssemblyName: ILGenerator
     FolderName: Libraries
-  - AssemblyName: TabInfo
-    FolderName: Libraries
