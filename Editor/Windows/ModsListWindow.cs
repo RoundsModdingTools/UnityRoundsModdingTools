@@ -1,5 +1,4 @@
-﻿using Sirenix.Utilities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,7 +17,14 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             GetWindow(typeof(ModsListWindow), false, "Mods List");
         }
 
-        void OnGUI() {
+        private void OnEnable() {
+            string[] assemblyDefinitionPaths = GetAllAssemblyDefinitionPath();
+            selectedMods = assemblyDefinitionPaths
+                .Select(AssemblyDefinition.Load)
+                .ToDictionary(assembly => assembly.AssemblyPath, assembly => false);
+        }
+
+        private void OnGUI() {
             GUILayout.Space(10);
 
             GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel);
@@ -29,20 +35,12 @@ namespace UnityRoundsModdingTools.Editor.Windows {
 
             GUILayout.Space(10);
 
-            string[] assemblyDefinitionPaths = AssemblyDefinitionUtils.GetAllAssemblyDefinitionPath();
-            assemblyDefinitionPaths.ForEach(path => {
-                if(!selectedMods.ContainsKey(path)) {
-                    selectedMods.Add(path, false);
-                }
-            });
-
-
             GUIUtils.DrawDictionaryEntries(0, ref selectedMods, (key, value) => {
-                int index = assemblyDefinitionPaths.ToList().IndexOf(key);
+                int index = selectedMods.Keys.ToList().IndexOf(key);
 
                 GUILayout.Label($"{Path.GetFileNameWithoutExtension(Path.Combine(Directory.GetCurrentDirectory(), key))}:", EditorStyles.boldLabel);
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("Focus", GUILayout.MaxWidth(50), GUILayout.MaxHeight(15))) {
+                if(GUILayout.Button("Focus", GUILayout.MaxWidth(50), GUILayout.MaxHeight(15))) {
                     AssemblyDefinitionAsset loadedAsset = AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(key);
                     EditorGUIUtility.PingObject(loadedAsset);
                     Selection.activeObject = loadedAsset;
@@ -50,32 +48,38 @@ namespace UnityRoundsModdingTools.Editor.Windows {
 
                 selectedMods[key] = GUILayout.Toggle(selectedMods[key], "");
             });
-            
-            List<string> selectedKeys = selectedMods.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
 
-            if(selectedKeys.Count > 0) {
-                if(GUILayout.Button((selectedKeys.Count > 1) ? "Bulk Delete" : "Delete")) {
+            var selectedAssemblyDefinitions = selectedMods
+                .Where(kvp => kvp.Value)
+                .Select(kvp => AssemblyDefinition.Load(kvp.Key));
+
+            if(selectedAssemblyDefinitions.Count() > 0) {
+                if(GUILayout.Button((selectedAssemblyDefinitions.Count() > 1) ? "Bulk Delete" : "Delete")) {
                     StringBuilder messageBuilder = new StringBuilder();
                     messageBuilder.AppendLine("Are you sure you want to delete the following mods?");
                     messageBuilder.AppendLine();
 
-                    foreach(string modToDelete in selectedKeys) {
-                        messageBuilder.AppendLine($"- {Path.GetFileNameWithoutExtension(modToDelete)}");
+                    foreach(string assembly in selectedAssemblyDefinitions.Select(assembly => assembly.Name)) {
+                        messageBuilder.AppendLine($"- {assembly}");
                     }
-
 
                     bool result = EditorUtility.DisplayDialog("Confirm Deletion", messageBuilder.ToString(), "Yes", "Cancel");
                     if(result) {
-                        foreach(string modToDelete in selectedKeys) {
-                            var assemblyDefinitionClass = AssemblyDefinitionUtils.ParseAssemblyDefinitionFie(modToDelete);
-                            ProjectMappings.Instance.folderMappings.RemoveAll(m => m.AssemblyName == assemblyDefinitionClass.name);
-
-                            Directory.GetParent(modToDelete).Delete(true);
+                        foreach(var assembly in selectedAssemblyDefinitions) {
+                            ProjectMappings.Instance.folderMappings.RemoveAll(m => m.AssemblyName == assembly.Name);
+                            Directory.GetParent(assembly.AssemblyPath).Delete(true);
                         }
+
                         AssetDatabase.Refresh();
                     }
                 }
             }
+        }
+
+        public static string[] GetAllAssemblyDefinitionPath() {
+            return AssetDatabase.GetAllAssetPaths()
+                .Where(path => path.Contains(".asmdef") && !path.StartsWith("Packages"))
+                .ToArray();
         }
     }
 }
