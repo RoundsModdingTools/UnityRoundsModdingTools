@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace UnityRoundsModdingTools.Editor.Utils {
-    public class ProjectUtils {
+    public static class ProjectUtils {
         public static List<string> ConvertToUnityProject(string directoryPath, bool refresh = true) {
             List<string> csprojFiles = Directory.GetFiles(directoryPath, "*.csproj", SearchOption.AllDirectories).ToList();
             List<string> asmdefFiles = Directory.GetFiles(directoryPath, "*.asmdef", SearchOption.AllDirectories).ToList();
 
-            List<string> assemblyNames = new List<string>();
+            List<AssemblyDefinition> assemblyDefinitions = new List<AssemblyDefinition>();
 
             if(csprojFiles.Count > 0) {
                 foreach(string csprojFile in csprojFiles) {
@@ -29,8 +29,11 @@ namespace UnityRoundsModdingTools.Editor.Utils {
                     Directory.CreateDirectory(modFolderCopyPath);
                     FileSystemManager.CopyDirectory(Path.GetDirectoryName(csprojFilePath), modFolderCopyPath);
 
-                    AssemblyDefinitionUtils.CreateAssemblyDefinition(assemblyName, modFolderCopyPath, Includes);
-                    assemblyNames.Add(assemblyName);
+                    var assemblyDefinition = AssemblyDefinition.LoadFromInclude(assemblyName, Includes);
+                    assemblyDefinition.AssemblyPath = Path.Combine(modFolderCopyPath, assemblyName + ".asmdef");
+                    assemblyDefinition.Save();
+
+                    assemblyDefinitions.Add(assemblyDefinition);
                 }
             } else if(asmdefFiles.Count > 0) {
                 UnityEngine.Debug.LogWarning("No .csproj files found in the directory, skipping conversion.");
@@ -42,15 +45,16 @@ namespace UnityRoundsModdingTools.Editor.Utils {
 
                 foreach(var assemblyDefinitionFile in asmdefFiles) {
                     string assemblyDefinitionFilePath = Path.Combine(Path.GetDirectoryName(directoryPath), assemblyDefinitionFile);
-                    var assemblyDefinitionClass = AssemblyDefinitionUtils.ParseAssemblyDefinitionFie(assemblyDefinitionFilePath);
-                    assemblyNames.Add(assemblyDefinitionClass.name);
+                    var assemblyDefinitionClass = AssemblyDefinition.Load(assemblyDefinitionFilePath);
+
+                    assemblyDefinitions.Add(assemblyDefinitionClass);
                 }
             } else {
                 UnityEngine.Debug.LogError($"No .csproj or .asmdef files found in the provided directory '{directoryPath}'. Please make sure the directory contains at least one .csproj or .asmdef file to proceed.");
                 return null;
             }
 
-            return assemblyNames;
+            return assemblyDefinitions.Select(assemblyDefinition => assemblyDefinition.Name).ToList();
         }
 
         private static string GetRootNamespace(string csprojFilePath) {

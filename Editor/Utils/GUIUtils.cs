@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 namespace UnityRoundsModdingTools.Editor.Utils {
-    public class GUIUtils {
+    public static class GUIUtils {
         private static Dictionary<int, Vector2> _scrollPositions = new Dictionary<int, Vector2>();
 
         public static void DrawListEntries<T>(int id, ref List<T> list, Action<T> processEntry, int maxHeight = 200) {
