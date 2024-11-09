@@ -5,6 +5,8 @@ using System.IO;
 using UnityEditor.Compilation;
 using System.Reflection;
 using Newtonsoft.Json;
+using System;
+using UnityEngine;
 
 namespace UnityRoundsModdingTools.Editor.Utils.Template {
     public interface ITemplateHandler {
@@ -25,10 +27,13 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
                 string serializedArgs = EditorPrefs.GetString($"Template_{handlerEntry.Key}_Serialized");
                 if(string.IsNullOrEmpty(serializedArgs)) continue;
 
-
                 var templateHandlerType = handlerEntry.Value.GetType();
                 templateHandlers[handlerEntry.Key] = (ITemplateHandler)JsonConvert.DeserializeObject(serializedArgs, templateHandlerType);
-                templateHandlers[handlerEntry.Key].AfterTemplateCompile();
+                try {
+                    templateHandlers[handlerEntry.Key].AfterTemplateCompile();
+                } catch (Exception e) {
+                    Debug.LogError($"Error while running AfterTemplateCompile for '{handlerEntry.Key}': {e.Message}");
+                }
                 EditorPrefs.SetString($"Template_{handlerEntry.Key}_Serialized", "");
             }
         }
