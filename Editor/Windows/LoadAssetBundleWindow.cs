@@ -7,7 +7,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
         private AssetBundle loadedAssetBundle;
         private Object[] loadedAssets;
 
-        private string assetBundlePath;
+        private static string assetBundlePath;
 
 
         [MenuItem("Unity Rounds Modding Tools/AssetBundle Loader")]
