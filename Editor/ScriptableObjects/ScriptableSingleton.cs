@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
@@ -31,10 +32,11 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
 
         private static void CreateAndLoad() {
             instance = ScriptableObject.CreateInstance<T>();
-            instance.hideFlags = HideFlags.HideAndDontSave;
 
             // Save the newly created instance as an asset
-            string path = $"Assets/Resources/{typeof(T).Name}.asset";
+            string path = $"Assets/Resources/UnityRoundsModdingTools/{typeof(T).Name}.asset";
+            if(!Directory.Exists(Path.GetDirectoryName(path))) Directory.CreateDirectory(Path.GetDirectoryName(path));
+
             AssetDatabase.CreateAsset(instance, path);
             AssetDatabase.SaveAssets();
             Debug.Log($"Created and saved new instance of {typeof(T).Name} at {path}");
