@@ -2,6 +2,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -9,6 +11,26 @@ using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
 namespace UnityRoundsModdingTools.Editor.Utils {
     public class AssemblyDefinition {
+        [JsonIgnore]
+        public Assembly Assembly {
+            get {
+                try { 
+                    return Assembly.Load(Name); 
+                } catch(Exception e) {
+                    Debug.LogError($"Failed to load assembly {Name}: {e.Message}");
+                }
+                return null;
+            }
+        }
+
+        [JsonIgnore]
+        public static AssemblyDefinition[] All {
+            get {
+                string[] assemblyDefinitionAssets = AssetDatabase.FindAssets($"t:{typeof(AssemblyDefinitionAsset).Name}");
+                string[] assemblyDefinitionPaths = assemblyDefinitionAssets.Select(AssetDatabase.GUIDToAssetPath).ToArray();
+                return assemblyDefinitionPaths.Select(Load).ToArray();
+            }
+        }
         [JsonIgnore] public string AssemblyPath { get; set; }
 
         [JsonProperty("name")] public string Name { get; private set; }
