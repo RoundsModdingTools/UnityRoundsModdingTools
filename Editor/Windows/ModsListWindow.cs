@@ -10,7 +10,7 @@ using UnityRoundsModdingTools.Editor.Utils;
 
 namespace UnityRoundsModdingTools.Editor.Windows {
     public class ModsListWindow : EditorWindow {
-        private Dictionary<string, bool> selectedMods = new Dictionary<string, bool>();
+        private static Dictionary<string, bool> selectedMods;
 
         [MenuItem("Unity Rounds Modding Tools/Mods List")]
         private static void ShowWindow() {
@@ -18,10 +18,12 @@ namespace UnityRoundsModdingTools.Editor.Windows {
         }
 
         private void OnEnable() {
-            string[] assemblyDefinitionPaths = GetAllAssemblyDefinitionPath();
-            selectedMods = assemblyDefinitionPaths
-                .Select(AssemblyDefinition.Load)
-                .ToDictionary(assembly => assembly.AssemblyPath, assembly => false);
+            if(selectedMods == null) {
+                selectedMods = GetAllAssemblyDefinitionPath()
+                    .Select(AssemblyDefinition.Load)
+                    .Where(a => !a.Name.StartsWith("UnityRoundsModdingTools"))
+                    .ToDictionary(assembly => assembly.AssemblyPath, assembly => false);
+            }
         }
 
         private void OnGUI() {
