@@ -2,58 +2,76 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
 namespace UnityRoundsModdingTools.Editor.Utils {
     public static class GithubUtils {
-        private static Settings Settings => Settings.Instance;
-
-        public static List<string> DownloadGithubProject(string githubURL) {
-            string[] ownerAndRepo = githubURL.Replace("https://github.com/", "").Split('/');
-
-            if(!IsValidGithubUrl(githubURL)) {
+        public static List<string> InstallGithubProject(string githubUrl) {
+            if(!IsValidGithubUrl(githubUrl)) {
                 UnityEngine.Debug.LogWarning("Invalid GitHub URL.");
                 return null;
             }
 
-            return DownloadAndInstallProject($"https://api.github.com/repos/{ownerAndRepo[0]}/{ownerAndRepo[1]}/zipball", $"{ownerAndRepo[1]}.zip");
+            string[] ownerAndRepo = ExtractOwnerAndRepo(githubUrl);
+            string fileName = $"{ownerAndRepo[1]}";
+
+            string savePath = DownloadGithubProject(githubUrl, fileName);
+            if(savePath == null) {
+                UnityEngine.Debug.LogError("Failed to download the project.");
+                return null;
+            }
+
+            var assemblyNames = ProjectUtils.ConvertToUnityProject(savePath);
+            Directory.Delete(Settings.Instance.TempPath, true);
+
+            return assemblyNames;
         }
 
-        private static List<string> DownloadAndInstallProject(string url, string fileName) {
-            string tempFolderPath = Path.Combine(Settings.TempPath, fileName.Replace(".zip", ""));
-            string savePath = Path.Combine(Settings.TempPath, fileName);
+        public static string DownloadGithubProject(string githubUrl, string fileName) {
+            string[] ownerAndRepo = ExtractOwnerAndRepo(githubUrl);
+            string downloadUrl = $"https://api.github.com/repos/{ownerAndRepo[0]}/{ownerAndRepo[1]}/zipball";
+            string savePath = Path.Combine(Settings.Instance.TempPath, fileName);
 
-            if(Directory.Exists(tempFolderPath)) Directory.Delete(tempFolderPath, true);
-            if(!Directory.Exists(Settings.TempPath)) Directory.CreateDirectory(Settings.TempPath);
-
-            UnityEngine.Debug.Log($"Downloading project from {url}...");
-            UnityEngine.Debug.Log($"Saving to {savePath}");
             try {
-                using(WebClient client = new WebClient()) {
-                    client.Headers.Add("User-Agent", "request");
+                PrepareDirectory(Settings.Instance.TempPath, savePath);
 
-                    client.DownloadFile(url, savePath);
-                    ZipFile.ExtractToDirectory(savePath, tempFolderPath);
+                UnityEngine.Debug.Log($"Downloading project from {githubUrl}...");
 
-                    var assemblyNames = ProjectUtils.ConvertToUnityProject(tempFolderPath);
-                    Directory.Delete(tempFolderPath, true);
-                    return assemblyNames;
+                using(var client = new WebClient()) {
+                    client.Headers.Add("User-Agent", "UnityRoundsModdingTools");
+                    client.DownloadFile(downloadUrl, $"{savePath}.zip");
+                    ZipFile.ExtractToDirectory($"{savePath}.zip", savePath);
+
+                    DirectoryInfo modDirectory = new DirectoryInfo(savePath);
+                    modDirectory = modDirectory.GetDirectories().First();
+                    return modDirectory.FullName;
                 }
+            } catch(WebException webEx) {
+                UnityEngine.Debug.LogError($"Web error during download: {webEx.Message}");
+            } catch(IOException ioEx) {
+                UnityEngine.Debug.LogError($"File I/O error: {ioEx.Message}");
             } catch(Exception ex) {
-                UnityEngine.Debug.LogError($"Error while downloading zip file: {ex.Message}");
+                UnityEngine.Debug.LogError($"Unexpected error: {ex.Message}");
             }
 
             return null;
         }
 
-        public static bool IsValidGithubUrl(string urlPath) {
-            string[] ownerAndRepo = urlPath.Replace("https://github.com/", "").Split('/');
+        public static bool IsValidGithubUrl(string url) {
+            string pattern = @"^https://github\.com/([^/]+/[^/]+)$";
+            return Regex.IsMatch(url, pattern);
+        }
 
-            if(ownerAndRepo.Length != 2) {
-                return false;
-            }
-            return true;
+        private static string[] ExtractOwnerAndRepo(string githubUrl) {
+            return githubUrl.Replace("https://github.com/", "").Split('/');
+        }
+
+        private static void PrepareDirectory(string tempFolderPath, string tempModFolderPath) {
+            if(!Directory.Exists(tempFolderPath)) Directory.CreateDirectory(tempFolderPath);
+            if(Directory.Exists(tempModFolderPath)) Directory.Delete(tempModFolderPath, true);
         }
     }
 }

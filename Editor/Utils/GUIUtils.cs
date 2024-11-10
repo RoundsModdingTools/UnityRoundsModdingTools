@@ -7,6 +7,25 @@ namespace UnityRoundsModdingTools.Editor.Utils {
     public static class GUIUtils {
         private static Dictionary<int, Vector2> _scrollPositions = new Dictionary<int, Vector2>();
 
+        public static void DrawTitle(string text) {
+            GUILayout.Space(10);
+
+            GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel) {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 18
+            };
+            GUILayout.Label(text, headerLabelStyle);
+            GUILayout.Space(10);
+        }
+
+
+        public static void CreateTextInput(string label, ref string value) {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(label, GUILayout.Width(120));
+            value = EditorGUILayout.TextField(value);
+            GUILayout.EndHorizontal();
+        }
+
         public static void DrawListEntries<T>(int id, ref List<T> list, Action<T> processEntry, int maxHeight = 200) {
             if(list.Count == 0) return;
             GUILayout.BeginVertical(GUI.skin.box);

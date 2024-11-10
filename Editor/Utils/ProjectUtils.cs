@@ -38,10 +38,7 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             } else if(asmdefFiles.Count > 0) {
                 UnityEngine.Debug.LogWarning("No .csproj files found in the directory, skipping conversion.");
 
-                DirectoryInfo modDirectory = new DirectoryInfo(directoryPath);
-                modDirectory = modDirectory.GetDirectories().First();
-
-                FileSystemManager.CopyDirectory(modDirectory.FullName, Path.Combine(FileSystemManager.ModsFolderPath, Path.GetFileName(directoryPath)));
+                FileSystemManager.CopyDirectory(directoryPath, Path.Combine(FileSystemManager.ModsFolderPath, Path.GetFileName(directoryPath)));
 
                 foreach(var assemblyDefinitionFile in asmdefFiles) {
                     string assemblyDefinitionFilePath = Path.Combine(Path.GetDirectoryName(directoryPath), assemblyDefinitionFile);
