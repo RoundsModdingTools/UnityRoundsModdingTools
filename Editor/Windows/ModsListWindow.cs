@@ -27,15 +27,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
         }
 
         private void OnGUI() {
-            GUILayout.Space(10);
-
-            GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel);
-            headerLabelStyle.alignment = TextAnchor.MiddleCenter;
-            headerLabelStyle.fontSize = 18;
-
-            GUILayout.Label("Mods List", headerLabelStyle);
-
-            GUILayout.Space(10);
+            GUIUtils.DrawTitle("Mods List");
 
             GUIUtils.DrawDictionaryEntries(0, ref selectedMods, (key, value) => {
                 int index = selectedMods.Keys.ToList().IndexOf(key);
@@ -53,7 +45,8 @@ namespace UnityRoundsModdingTools.Editor.Windows {
 
             var selectedAssemblyDefinitions = selectedMods
                 .Where(kvp => kvp.Value)
-                .Select(kvp => AssemblyDefinition.Load(kvp.Key));
+                .Select(kvp => AssemblyDefinition.Load(kvp.Key))
+                .ToList();
 
             if(selectedAssemblyDefinitions.Count() > 0) {
                 if(GUILayout.Button((selectedAssemblyDefinitions.Count() > 1) ? "Bulk Delete" : "Delete")) {
@@ -70,6 +63,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                         foreach(var assembly in selectedAssemblyDefinitions) {
                             ProjectMappings.Instance.folderMappings.RemoveAll(m => m.AssemblyName == assembly.Name);
                             Directory.GetParent(assembly.AssemblyPath).Delete(true);
+                            selectedMods.Remove(assembly.AssemblyPath);
                         }
 
                         AssetDatabase.Refresh();

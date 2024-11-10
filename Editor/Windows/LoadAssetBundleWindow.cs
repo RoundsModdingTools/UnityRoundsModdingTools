@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityRoundsModdingTools.Editor.Utils;
 
 namespace UnityRoundsModdingTools.Editor.Windows {
     public class LoadAssetBundleWindow : EditorWindow {
@@ -16,15 +17,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
         }
 
         private void OnGUI() {
-            GUILayout.Space(10);
-
-            GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel);
-            headerLabelStyle.alignment = TextAnchor.MiddleCenter;
-            headerLabelStyle.fontSize = 18;
-
-            GUILayout.Label("AssetBundle Loader", headerLabelStyle);
-
-            GUILayout.Space(10);
+            GUIUtils.DrawTitle("AssetBundle Loader");
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Select AssetBundle:");

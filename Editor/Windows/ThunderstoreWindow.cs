@@ -44,14 +44,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             EditorPrefs.SetString("ThunderstoreSearchQuery", searchQuery);
             EditorPrefs.SetInt("ThunderstoreSortType", (int)sortType);
 
-            GUILayout.Space(10);
-
-            GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel);
-            headerLabelStyle.alignment = TextAnchor.MiddleCenter;
-            headerLabelStyle.fontSize = 18;
-
-            GUILayout.Label("Thunderstore", headerLabelStyle);
-            GUILayout.Space(10);
+            GUIUtils.DrawTitle("Thunderstore");
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Search:", GUILayout.Width(50));
@@ -85,7 +78,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                         if(GUILayout.Button("Install", GUILayout.MaxWidth(60), GUILayout.MaxHeight(15))) {
                             bool result = EditorUtility.DisplayDialog("Install Mod", $"Are you sure you want to install \"{package.Name}\"?", "Yes", "Cancel");
                             if(result) {
-                                var installAssemblies = GithubUtils.DownloadGithubProject(package.Versions[0].WebsiteUrl);
+                                var installAssemblies = GithubUtils.InstallGithubProject(package.Versions[0].WebsiteUrl);
                                 if(installAssemblies != null) {
                                     foreach(string installAssembly in installAssemblies) {
                                         if(!ProjectMappings.Instance.folderMappings.Exists(folder => folder.AssemblyName == installAssembly)) {

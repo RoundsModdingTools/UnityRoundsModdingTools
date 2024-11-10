@@ -21,15 +21,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
         private void OnGUI() {
             EditorPrefs.SetString("SelectedSolutionPath", selectedSolutionPath);
 
-            GUILayout.Space(10);
-
-            GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel);
-            headerLabelStyle.alignment = TextAnchor.MiddleCenter;
-            headerLabelStyle.fontSize = 18;
-
-            GUILayout.Label("Install Mod", headerLabelStyle);
-
-            GUILayout.Space(10);
+            GUIUtils.DrawTitle("Install Mod");
 
             GUILayout.Label("Enter a GitHub repository URL or a local solution directory path.", EditorStyles.boldLabel);
             GUILayout.BeginHorizontal();
@@ -63,7 +55,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
 
                 if(GUILayout.Button("Install Mod")) {
                     List<string> installAssemblies;
-                    if(isGithubUrl) installAssemblies = GithubUtils.DownloadGithubProject(selectedSolutionPath);
+                    if(isGithubUrl) installAssemblies = GithubUtils.InstallGithubProject(selectedSolutionPath);
                     else installAssemblies = ProjectUtils.ConvertToUnityProject(selectedSolutionPath);
 
                     if(installAssemblies != null) {
