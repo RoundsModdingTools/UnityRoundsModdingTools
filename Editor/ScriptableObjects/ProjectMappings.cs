@@ -38,6 +38,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     public struct ProjectMapping {
         public string ModName;
         public string AssetBundleName;
+        public ProjectMapping(string modName, string assetBundleName) {
+            ModName = modName;
+            AssetBundleName = assetBundleName;
+        }
     }
 
     [Serializable]

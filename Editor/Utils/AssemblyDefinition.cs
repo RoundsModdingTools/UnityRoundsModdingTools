@@ -23,12 +23,17 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             }
         }
 
-        [JsonIgnore]
-        public static AssemblyDefinition[] All {
+        [JsonIgnore] private static AssemblyDefinition[] _all;
+        [JsonIgnore] public static AssemblyDefinition[] All {
             get {
-                string[] assemblyDefinitionAssets = AssetDatabase.FindAssets($"t:{typeof(AssemblyDefinitionAsset).Name}");
-                string[] assemblyDefinitionPaths = assemblyDefinitionAssets.Select(AssetDatabase.GUIDToAssetPath).ToArray();
-                return assemblyDefinitionPaths.Select(Load).ToArray();
+                // This saves a lot of performance by not loading all the assembly definitions every time.
+                if(_all == null) {
+                    string[] assemblyDefinitionAssets = AssetDatabase.FindAssets($"t:{typeof(AssemblyDefinitionAsset).Name}");
+                    string[] assemblyDefinitionPaths = assemblyDefinitionAssets.Select(AssetDatabase.GUIDToAssetPath).ToArray();
+                    _all = assemblyDefinitionPaths.Select(Load).ToArray();
+                }
+
+                return _all;
             }
         }
         [JsonIgnore] public string AssemblyPath { get; set; }

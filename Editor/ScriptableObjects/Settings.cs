@@ -11,6 +11,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public string BepinexAndHarmonyFolderPath = "Scripts/Mods/Bepinex and Harmony";
         public string TempPath = $"{Path.GetTempPath()}/UnityRoundsModdingTools";
 
+        [Header("Settings for Creating Mod")]
+        public string ModTemplatePath = "https://github.com/RoundsModdingTools/UnityRoundsModTemplate";
+        public string ModTemplateOutputPath = "Assets/Mods";
+
         [Header("Settings for Coverting Project to Unity Project")]
         [HideInInspector] public List<string> BlacklistedDirectory = new List<string>() { "obj", "bin", ".git", ".vs", "Assemblies" };
         [HideInInspector] public List<string> BlacklistedFileExtension = new List<string> { "csproj", "sln", "dll" };
