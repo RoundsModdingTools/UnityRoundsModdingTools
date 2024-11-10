@@ -32,9 +32,9 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
                 try {
                     templateHandlers[handlerEntry.Key].AfterTemplateCompile();
                 } catch (Exception e) {
-                    Debug.LogError($"Error while running AfterTemplateCompile for '{handlerEntry.Key}': {e.Message}");
+                    UnityEngine.Debug.LogError($"Error while running AfterTemplateCompile for '{handlerEntry.Key}': {e}");
                 }
-                EditorPrefs.SetString($"Template_{handlerEntry.Key}_Serialized", "");
+                EditorPrefs.DeleteKey($"Template_{handlerEntry.Key}_Serialized");
             }
         }
 
