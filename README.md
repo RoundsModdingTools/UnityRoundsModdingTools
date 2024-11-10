@@ -11,11 +11,10 @@
 
 - **Thunderstore Window**  
   A dedicated window for installing mods directly from [Thunderstore](https://thunderstore.io/c/rounds/) if the mod’s **Thunderstore page** includes a GitHub link.
-
-## Future Plans
-
+  
 - **Create Mod Window**  
-  Plan to introduce a `Create Mod` window to automatically set up boilerplate code, providing a quick and efficient starting point for new mod development.
+  The `Create Mod` window setup the boilerplate code automatically, providing a quick starting point for new mod development.
+  
 ## Installation
 
 1. **Download the Unity Package**  
