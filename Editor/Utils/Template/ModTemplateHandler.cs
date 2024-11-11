@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -17,6 +15,7 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
         public string version;
 
         private string safeModName => modName.Replace(" ", "").Replace("-", "");
+        private string assetBundleName => $"{safeModName.ToLower()}_assets";
 
         public string[] bepInDependencies;
         public string modPath;
@@ -35,7 +34,8 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
                 .Replace("{{MOD_NAME}}", modName)
                 .Replace("{{MOD_INITIAL}}", modInitial)
                 .Replace("{{VERSION}}", version)
-                .Replace("{{MOD_SAFE_NAME}}", safeModName);
+                .Replace("{{MOD_SAFE_NAME}}", safeModName)
+                .Replace("{{ASSET_BUNDLE_NAME}}", assetBundleName);
 
             template = bepInDependenciesRegex.Replace(template, dependencies.ToString());
 
@@ -72,11 +72,11 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
             string[] assetGUIDS = AssetDatabase.FindAssets("t:GameObject", new string[] { modPath });
             foreach(var assetGUID in assetGUIDS) {
                 string assetPath = AssetDatabase.GUIDToAssetPath(assetGUID);
-                AssetImporter.GetAtPath(assetPath).SetAssetBundleNameAndVariant($"{safeModName.ToLower()}_assets", "");
+                AssetImporter.GetAtPath(assetPath).SetAssetBundleNameAndVariant(assetBundleName, "");
             }
 
             if(!ProjectMappings.Instance.projectMappings.Exists(mapping => mapping.ModName == safeModName))
-                ProjectMappings.Instance.projectMappings.Add(new ProjectMapping(safeModName, $"{safeModName.ToLower()}_assets"));
+                ProjectMappings.Instance.projectMappings.Add(new ProjectMapping(safeModName, assetBundleName));
         }
     }
 }
