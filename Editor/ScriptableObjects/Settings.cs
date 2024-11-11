@@ -6,14 +6,14 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     [CreateAssetMenu(fileName = "Settings", menuName = "Unity Rounds Modding Tools/Settings", order = 0)]
     internal class Settings : ScriptableSingleton<Settings> {
         [Header("Settings for Modding Tools")]
-        public string DllsFolderPath = "Scripts/dlls";
-        public string ModsFolderPath = "Scripts/Mods";
-        public string BepinexFolderPath = "Scripts/Mods/Bepinex and Harmony";
-        public string TempPath = $"{Path.GetTempPath()}/UnityRoundsModdingTools";
+        public string DllsFolderPath = "Scripts\\dlls";
+        public string ModsFolderPath = "Scripts\\Mods";
+        public string BepinexFolderPath = "Scripts\\Mods\\Bepinex and Harmony";
+        public string TempPath = $"{Path.GetTempPath()}UnityRoundsModdingTools";
 
         [Header("Settings for Creating Mod")]
         public string TemplatePath = "https://github.com/RoundsModdingTools/UnityRoundsModTemplate";
-        public string TemplateOutputPath = "Assets/Mods";
+        public string TemplateOutputPath = "Assets\\Mods";
 
         [Header("Settings for Coverting Project to Unity Project")]
         [HideInInspector] public List<string> BlacklistedDirectory = new List<string>() { "obj", "bin", ".git", ".vs", "Assemblies" };
