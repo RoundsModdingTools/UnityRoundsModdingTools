@@ -18,9 +18,9 @@ namespace UnityRoundsModdingTools.Editor.Windows {
     public class CreateModWindow : EditorWindow {
         private static readonly Regex modIdRegex = new Regex("^[a-zA-Z0-9_.]*$", RegexOptions.Compiled);
 
-        private string modId;
-        private string modName;
-        private string modInitial;
+        private static string modId;
+        private static string modName;
+        private static string modInitial;
 
         private static List<AssemblyDefinition> assemblyReferences;
         private static List<string> includedPrecompiledAssemblies = new List<string>() {
