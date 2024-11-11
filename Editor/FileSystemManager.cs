@@ -8,7 +8,7 @@ namespace UnityRoundsModdingTools.Editor {
 
         public static string DllsFolderPath => Path.Combine(Application.dataPath, Settings.DllsFolderPath);
         public static string ModsFolderPath => Path.Combine(Application.dataPath, Settings.ModsFolderPath);
-        public static string BepinexAndHarmonyFolderPath => Path.Combine(Application.dataPath, Settings.BepinexAndHarmonyFolderPath);
+        public static string BepinexAndHarmonyFolderPath => Path.Combine(Application.dataPath, Settings.BepinexFolderPath);
 
         public static void CopyDirectory(string sourceDirPath, string destDirPath) {
             DirectoryInfo sourceDir = new DirectoryInfo(sourceDirPath);

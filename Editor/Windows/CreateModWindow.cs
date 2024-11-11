@@ -75,14 +75,14 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                 && !modInitial.IsNullOrWhitespace()
                 && !AssemblyDefinition.All.Any(x => x.Name == modName);
 
-            bool isGithubUrl = Settings.Instance.ModTemplatePath.StartsWith("https://github.com/");
+            bool isGithubUrl = Settings.Instance.TemplatePath.StartsWith("https://github.com/");
             if(isGithubUrl) {
-                if(!GithubUtils.IsValidGithubUrl(Settings.Instance.ModTemplatePath)) {
+                if(!GithubUtils.IsValidGithubUrl(Settings.Instance.TemplatePath)) {
                     EditorGUILayout.HelpBox("Invalid GitHub URL.", MessageType.Error);
                     canCreateMod = false;
                 }
             } else {
-                if(!Directory.Exists(Settings.Instance.ModTemplatePath)) {
+                if(!Directory.Exists(Settings.Instance.TemplatePath)) {
                     EditorGUILayout.HelpBox("Path not found.", MessageType.Error);
                     canCreateMod = false;
                 }
@@ -91,15 +91,15 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             GUI.enabled = canCreateMod;
             if(GUILayout.Button("Create Mod")) {
                 string modSafeName = modName.Replace(" ", "").Replace("-", "");
-                string modPath = Path.Combine(Settings.Instance.ModTemplateOutputPath, $"_{modName}");
-                string modTemplatePath = Settings.Instance.ModTemplatePath;
+                string modPath = Path.Combine(Settings.Instance.TemplateOutputPath, $"_{modName}");
+                string modTemplatePath = Settings.Instance.TemplatePath;
                 modTemplatePath = isGithubUrl ? Path.Combine(Settings.Instance.TempPath, "ModTemplate") : modTemplatePath;
 
                 AssetDatabase.StartAssetEditing();
 
                 try {
                     if(isGithubUrl) {
-                        string savePath = GithubUtils.DownloadGithubProject(Settings.Instance.ModTemplatePath, "ModTemplate");
+                        string savePath = GithubUtils.DownloadGithubProject(Settings.Instance.TemplatePath, "ModTemplate");
                         FileSystemManager.CopyDirectory(savePath, modPath);
                         Directory.Delete(Settings.Instance.TempPath, true);
                     } else {
