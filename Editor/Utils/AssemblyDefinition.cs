@@ -23,6 +23,17 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             }
         }
 
+        [JsonIgnore] private AssemblyDefinitionAsset _asset;
+        [JsonIgnore] public AssemblyDefinitionAsset Asset {
+            get {
+                if(_asset == null) {
+                    _asset = AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(AssemblyPath);
+                }
+
+                return _asset;
+            }
+        }
+
         [JsonIgnore] private static AssemblyDefinition[] _all;
         [JsonIgnore] public static AssemblyDefinition[] All {
             get {
