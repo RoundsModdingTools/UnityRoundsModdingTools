@@ -19,7 +19,7 @@ namespace UnityRoundsModdingTools.Editor.Utils {
                     string assemblyName = GetAssemblyName(csprojFilePath) ?? rootNamespace;
 
                     List<string> Includes = GetReferencesFromCsproj(csprojFilePath);
-                    Includes.Add("ILGenerator");
+                    if (AssemblyDefinition.All.Any(x => x.Name == "ILGenerator")) Includes.Add("ILGenerator");
 
                     // We are removing System and Microsoft references because 'AssemblyDefinition' automatically includes them.
                     Includes.RemoveAll(x => x.StartsWith("System") || x.StartsWith("Microsoft."));
