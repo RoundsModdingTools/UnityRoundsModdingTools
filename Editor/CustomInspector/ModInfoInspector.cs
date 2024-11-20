@@ -1,7 +1,9 @@
 ﻿using BepInEx;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -84,13 +86,9 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             }
 
             string modDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(modInfo));
-            string manifestPath = Path.Combine(modDirectory, "manifest.json");
             string readmePath = Path.Combine(modDirectory, "README.md");
             string iconPath = Path.Combine(modDirectory, "icon.png");
 
-            if(!File.Exists(manifestPath)) {
-                EditorGUILayout.HelpBox("Manifest file not found. Please create one.", MessageType.Error);
-            }
             if(!File.Exists(readmePath)) {
                 EditorGUILayout.HelpBox("README file not found. Please create one.", MessageType.Error);
             }
@@ -99,11 +97,11 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             }
 
             if(GUILayout.Button("Publish") && !modName.stringValue.IsNullOrWhiteSpace()) {
-                PublishMod(manifestPath, readmePath, iconPath);
+                PublishMod(readmePath, iconPath);
             }
         }
 
-        private void PublishMod(string manifestPath, string readmePath, string iconPath) {  
+        private void PublishMod(string readmePath, string iconPath) {  
             ModInfo modInfo = (ModInfo)target;
 
             string publishPath = Path.Combine(Settings.Instance.PublishPath, modInfo.ModName);
@@ -115,8 +113,16 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
 
             string DllObjPath = GetDLLObjPath(modInfo.ModAssemblyDefinition.Assembly.Location);
 
+            Manifest manifest = new Manifest {
+                ModName = modInfo.ModName,
+                Version = modInfo.Version,
+                WebsiteURL = modInfo.WebsiteURL,
+                Description = modInfo.Description,
+                Dependencies = modInfo.dependencies,
+            };
+
             File.Copy(DllObjPath, Path.Combine(publishPath, Path.GetFileName(DllObjPath)));
-            File.Copy(manifestPath, Path.Combine(publishPath, "manifest.json"));
+            File.WriteAllText(Path.Combine(publishPath, "manifest.json"), JsonConvert.SerializeObject(manifest, Formatting.Indented));
             File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
             File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
 
@@ -146,5 +152,13 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
 
             return null;
         }
+    }
+
+    public struct Manifest {
+        public string ModName;
+        public string Version;
+        public string WebsiteURL;
+        public string Description;
+        public string[] Dependencies;
     }
 }

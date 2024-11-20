@@ -12,7 +12,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public string Version = "1.0.0";
         public string WebsiteURL;
         public string Description;
-        public List<string> dependencies;
+        public string[] dependencies;
 
         public AssemblyDefinition ModAssemblyDefinition {
             get {
