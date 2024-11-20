@@ -1,7 +1,9 @@
+using BepInEx;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEditor;
 
 namespace UnityRoundsModdingTools.Editor.Utils {
     public static class ProjectUtils {
@@ -18,8 +20,13 @@ namespace UnityRoundsModdingTools.Editor.Utils {
                     string rootNamespace = GetRootNamespace(csprojFilePath);
                     string assemblyName = GetAssemblyName(csprojFilePath) ?? rootNamespace;
 
+                    if(assemblyName.IsNullOrWhiteSpace()) {
+                        EditorUtility.DisplayDialog("Error", "Failed to get assembly name from the .csproj file.", "OK");
+                        return null;
+                    }
+
                     List<string> Includes = GetReferencesFromCsproj(csprojFilePath);
-                    if (AssemblyDefinition.All.Any(x => x.Name == "ILGenerator")) Includes.Add("ILGenerator");
+                    if(AssemblyDefinition.All.Any(x => x.Name == "ILGenerator")) Includes.Add("ILGenerator");
 
                     // We are removing System and Microsoft references because 'AssemblyDefinition' automatically includes them.
                     Includes.RemoveAll(x => x.StartsWith("System") || x.StartsWith("Microsoft."));
@@ -59,6 +66,7 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             string pattern = @"<RootNamespace>(.*?)<\/RootNamespace>";
             Match match = Regex.Match(xmlData, pattern);
 
+            if(match.Groups[1].Value == "") return Path.GetFileNameWithoutExtension(csprojFilePath);
             return match.Groups[1].Value;
         }
 
@@ -67,7 +75,7 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             string pattern = @"<AssemblyName>(.*?)<\/AssemblyName>";
             Match match = Regex.Match(xmlData, pattern);
 
-            if(match.Groups[1].Value == "") return null;
+            if(match.Groups[1].Value == "") return Path.GetFileNameWithoutExtension(csprojFilePath);
             return match.Groups[1].Value;
         }
 
