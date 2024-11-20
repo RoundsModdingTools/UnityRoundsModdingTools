@@ -5,7 +5,7 @@ using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
 namespace UnityRoundsModdingTools.Editor.CustomInspector {
     [CustomEditor(typeof(ProjectMappings))]
-    public class ProjectMappingsInspetor : UnityEditor.Editor {
+    public class ProjectMappingsInspector : UnityEditor.Editor {
         public override void OnInspectorGUI() {
             base.OnInspectorGUI();
 
