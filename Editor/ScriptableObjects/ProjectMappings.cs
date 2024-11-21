@@ -5,9 +5,9 @@ using UnityEngine;
 namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     [CreateAssetMenu(fileName = "ProjectMapping", menuName = "Unity Rounds Modding Tools/Project Mapping", order = 0)]
     public class ProjectMappings : ScriptableSingleton<ProjectMappings> {
-        public List<ProjectMapping> projectMappings = new List<ProjectMapping>();
+        public List<ModBundleMapping> ModBundleMappings = new List<ModBundleMapping>();
 
-        public List<FolderMapping> folderMappings = new List<FolderMapping>() {
+        public List<FolderMapping> FolderMappings = new List<FolderMapping>() {
             new FolderMapping("CardChoiceSpawnUniqueCardPatch", "Libraries"),
             new FolderMapping("CardThemeLib", "Libraries"),
             new FolderMapping("ClassesManagerReborn", "Libraries"),
@@ -26,7 +26,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public List<string> GetFolderNames() {
             List<string> folderNames = new List<string>();
 
-            foreach(FolderMapping folder in folderMappings) {
+            foreach(FolderMapping folder in FolderMappings) {
                 if(!folderNames.Contains(folder.FolderName)) folderNames.Add(folder.FolderName);
             }
 
@@ -35,10 +35,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     }
 
     [Serializable]
-    public struct ProjectMapping {
+    public struct ModBundleMapping {
         public string ModName;
         public string AssetBundleName;
-        public ProjectMapping(string modName, string assetBundleName) {
+        public ModBundleMapping(string modName, string assetBundleName) {
             ModName = modName;
             AssetBundleName = assetBundleName;
         }

@@ -75,8 +75,8 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
                 AssetImporter.GetAtPath(assetPath).SetAssetBundleNameAndVariant(assetBundleName, "");
             }
 
-            if(!ProjectMappings.Instance.projectMappings.Exists(mapping => mapping.ModName == safeModName))
-                ProjectMappings.Instance.projectMappings.Add(new ProjectMapping(safeModName, assetBundleName));
+            if(!ProjectMappings.Instance.ModBundleMappings.Exists(mapping => mapping.ModName == safeModName))
+                ProjectMappings.Instance.ModBundleMappings.Add(new ModBundleMapping(safeModName, assetBundleName));
         }
     }
 }

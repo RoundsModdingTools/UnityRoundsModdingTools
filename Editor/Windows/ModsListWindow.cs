@@ -61,7 +61,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                     bool result = EditorUtility.DisplayDialog("Confirm Deletion", messageBuilder.ToString(), "Yes", "Cancel");
                     if(result) {
                         foreach(var assembly in selectedAssemblyDefinitions) {
-                            ProjectMappings.Instance.folderMappings.RemoveAll(m => m.AssemblyName == assembly.Name);
+                            ProjectMappings.Instance.FolderMappings.RemoveAll(m => m.AssemblyName == assembly.Name);
                             Directory.GetParent(assembly.AssemblyPath).Delete(true);
                             selectedMods.Remove(assembly.AssemblyPath);
                         }

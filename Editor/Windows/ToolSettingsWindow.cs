@@ -27,7 +27,7 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
     }
 
     public class SettingsGUI {
-        private static ReorderableList projectMappingsList;
+        private static ReorderableList ModBundleMappingsList;
         private static ReorderableList folderMappingsList;
 
         private static SerializedObject settingsSerializedObject;
@@ -41,9 +41,11 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
                     instance = new SettingsGUI();
                     instance.InitializeGUI();
                 }
+
                 return instance;
             }
         }
+
 
         public void RenderSettings() {
             GUILayout.Label("Path Settings", EditorStyles.boldLabel);
@@ -69,7 +71,7 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
                 EditorGUILayout.HelpBox("The original CsprojPostprocessor.cs file has been found. Please remove or rename the file extension to use this feature.", MessageType.Error);
                 GUI.enabled = false;
             }
-            projectMappingsList.DoLayoutList();
+            ModBundleMappingsList.DoLayoutList();
             GUILayout.Space(10);
             folderMappingsList.DoLayoutList();
             GUI.enabled = true;
@@ -89,20 +91,21 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
 
         public void InitializeGUI() {
             settingsSerializedObject = new SerializedObject(ProjectMappings.Instance);
-            projectMappingsProperty = settingsSerializedObject.FindProperty("projectMappings");
-            folderMappingsProperty = settingsSerializedObject.FindProperty("folderMappings");
+
+            projectMappingsProperty = settingsSerializedObject.FindProperty("ModBundleMappings");
+            folderMappingsProperty = settingsSerializedObject.FindProperty("FolderMappings");
 
             CreateProjectMappingsList();
             CreateFolderMappingsList();
         }
 
         private void CreateProjectMappingsList() {
-            projectMappingsList = new ReorderableList(settingsSerializedObject, projectMappingsProperty, true, true, true, true);
-            projectMappingsList.drawHeaderCallback = rect => {
-                EditorGUI.LabelField(rect, "Project Mappings");
+            ModBundleMappingsList = new ReorderableList(settingsSerializedObject, projectMappingsProperty, true, true, true, true);
+            ModBundleMappingsList.drawHeaderCallback = rect => {
+                EditorGUI.LabelField(rect, "Mod Bundle Mappings");
             };
-            projectMappingsList.drawElementCallback = (rect, index, isActive, isFocused) => {
-                var element = projectMappingsList.serializedProperty.GetArrayElementAtIndex(index);
+            ModBundleMappingsList.drawElementCallback = (rect, index, isActive, isFocused) => {
+                var element = ModBundleMappingsList.serializedProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
                 float halfWidth = rect.width / 2 - 10;
 
@@ -119,7 +122,7 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
 
                 settingsSerializedObject.ApplyModifiedProperties();
             };
-            projectMappingsList.onAddCallback = list => {
+            ModBundleMappingsList.onAddCallback = list => {
                 var index = list.serializedProperty.arraySize;
                 list.serializedProperty.arraySize++;
                 list.index = index;
@@ -130,7 +133,7 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
 
                 settingsSerializedObject.ApplyModifiedProperties();
             };
-            projectMappingsList.onRemoveCallback = list => {
+            ModBundleMappingsList.onRemoveCallback = list => {
                 list.serializedProperty.DeleteArrayElementAtIndex(list.index);
                 settingsSerializedObject.ApplyModifiedProperties();
             };

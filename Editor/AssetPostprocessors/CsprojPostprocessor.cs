@@ -7,11 +7,11 @@ using UnityRoundsModdingTools.Editor.ScriptableObjects;
 
 namespace UnityRoundsModdingTools.Editor.AssetPostprocessors {
     internal class CsprojPostprocessor : AssetPostprocessor {
-        private static List<ProjectMapping> ModBundleMap => ProjectMappings.Instance.projectMappings;
+        private static List<ModBundleMapping> ModBundleMap => ProjectMappings.Instance.ModBundleMappings;
 
 
         private static List<string> Folders => ProjectMappings.Instance.GetFolderNames();
-        private static List<FolderMapping> FolderMap => ProjectMappings.Instance.folderMappings;
+        private static List<FolderMapping> FolderMap => ProjectMappings.Instance.FolderMappings;
 
         public static string OnGeneratedCSProject(string path, string content) {
             if (File.Exists("Assets/Editor/CsprojPostprocessor.cs")) return content;

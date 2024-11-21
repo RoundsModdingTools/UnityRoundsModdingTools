@@ -81,8 +81,8 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                                 var installAssemblies = GithubUtils.InstallGithubProject(package.Versions[0].WebsiteUrl);
                                 if(installAssemblies != null) {
                                     foreach(string installAssembly in installAssemblies) {
-                                        if(!ProjectMappings.Instance.folderMappings.Exists(folder => folder.AssemblyName == installAssembly)) {
-                                            ProjectMappings.Instance.folderMappings.Add(new FolderMapping(installAssembly, "Libraries"));
+                                        if(!ProjectMappings.Instance.FolderMappings.Exists(folder => folder.AssemblyName == installAssembly)) {
+                                            ProjectMappings.Instance.FolderMappings.Add(new FolderMapping(installAssembly, "Libraries"));
                                         }
                                     }
                                     ProjectMappings.Save();
