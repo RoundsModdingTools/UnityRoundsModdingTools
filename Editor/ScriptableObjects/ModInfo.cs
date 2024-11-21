@@ -53,10 +53,11 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
                 Dependencies = dependencies,
             };
 
-            File.Copy(DllObjPath, Path.Combine(publishPath, Path.GetFileName(DllObjPath)));
             File.WriteAllText(Path.Combine(publishPath, "manifest.json"), JsonConvert.SerializeObject(manifest, Formatting.Indented));
-            File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
-            File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
+
+            if(DllObjPath != null) File.Copy(DllObjPath, Path.Combine(publishPath, Path.GetFileName(DllObjPath)));
+            if(File.Exists(readmePath)) File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
+            if(File.Exists(iconPath)) File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
             if(File.Exists(changelogPath)) File.Copy(changelogPath, Path.Combine(publishPath, "CHANGELOG.md"));
 
             ZipFile.CreateFromDirectory(publishPath, $"{publishPath}.zip");
