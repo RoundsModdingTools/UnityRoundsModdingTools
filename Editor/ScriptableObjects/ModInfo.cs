@@ -33,8 +33,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public void PublishMod() {
             string modDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(this));
             string publishPath = Path.Combine(Settings.Instance.PublishPath, ModName);
+
             string readmePath = Path.Combine(modDirectory, "README.md");
             string iconPath = Path.Combine(modDirectory, "icon.png");
+            string changelogPath = Path.Combine(modDirectory, "CHANGELOG.md");
 
             if(Directory.Exists(publishPath)) Directory.Delete(publishPath, true);
             if(File.Exists($"{publishPath}.zip")) File.Delete($"{publishPath}.zip");
@@ -55,6 +57,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             File.WriteAllText(Path.Combine(publishPath, "manifest.json"), JsonConvert.SerializeObject(manifest, Formatting.Indented));
             File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
             File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
+            if(File.Exists(changelogPath)) File.Copy(changelogPath, Path.Combine(publishPath, "CHANGELOG.md"));
 
             ZipFile.CreateFromDirectory(publishPath, $"{publishPath}.zip");
 
