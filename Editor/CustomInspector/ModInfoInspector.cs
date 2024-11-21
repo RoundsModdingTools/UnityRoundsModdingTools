@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -102,7 +101,7 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             }
         }
 
-        private void PublishMod(string readmePath, string iconPath) {  
+        private void PublishMod(string readmePath, string iconPath) {
             ModInfo modInfo = (ModInfo)target;
 
             string publishPath = Path.Combine(Settings.Instance.PublishPath, modInfo.ModName);
@@ -128,6 +127,14 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
 
             ZipFile.CreateFromDirectory(publishPath, $"{publishPath}.zip");
+
+            if (!Settings.Instance.PublishFolderCopyTo.IsNullOrWhiteSpace() && Directory.Exists(Settings.Instance.PublishFolderCopyTo)) {
+                string copyToPath = Path.Combine(Settings.Instance.PublishFolderCopyTo, $"Unknown-{modInfo.ModName}");
+                if(Directory.Exists(copyToPath)) Directory.Delete(copyToPath, true);
+
+                // Copy the folder to the specified path
+                FileSystemManager.CopyDirectory(publishPath, copyToPath, new string[] { }, new string[] { });
+            }
         }
 
         private string GetDLLObjPath(string dllPath) {
