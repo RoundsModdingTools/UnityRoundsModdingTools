@@ -98,6 +98,7 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
 
             if(GUILayout.Button("Publish") && !modName.stringValue.IsNullOrWhiteSpace()) {
                 PublishMod(readmePath, iconPath);
+                EditorUtility.RevealInFinder(Path.Combine(Settings.Instance.PublishPath, modName.stringValue));
             }
         }
 
@@ -155,10 +156,11 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
     }
 
     public struct Manifest {
-        public string ModName;
-        public string Version;
-        public string WebsiteURL;
-        public string Description;
-        public string[] Dependencies;
+
+        [JsonProperty("name")] public string ModName;
+        [JsonProperty("version_number")] public string Version;
+        [JsonProperty("website_url")] public string WebsiteURL;
+        [JsonProperty("description")] public string Description;
+        [JsonProperty("dependencies")] public string[] Dependencies;
     }
 }
