@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityRoundsModdingTools.Editor.Thunderstore.API.Entities;
 
@@ -16,8 +17,10 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
 
             IEnumerable<Package> filteredPackages =
                 from package in packages
-                where package.Name.Contains(searchTerm) || package.FullName.Contains(searchTerm)
+                where package.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                   || package.FullName.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
                 select package;
+
 
             filteredPackages = filteredPackages.SortPackages(sortType);
 
