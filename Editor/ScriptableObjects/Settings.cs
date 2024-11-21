@@ -17,7 +17,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public string TemplateOutputPath = "Assets\\Mods";
 
         [Header("Settings for Coverting Project to Unity Project")]
-        [HideInInspector] public List<string> BlacklistedDirectory = new List<string>() { "obj", "bin", ".git", ".vs", "Assemblies" };
+        [HideInInspector] public List<string> BlacklistedDirectory = new List<string>() { "obj", "bin", ".vs", "Assemblies" };
         [HideInInspector] public List<string> BlacklistedFileExtension = new List<string> { "csproj", "sln", "dll" };
         [HideInInspector] public List<string> WhitelistedUnityReferences = new List<string>() { "Unity.TextMeshPro", "Unity.TextMeshPro.Editor", "Unity.TextMeshPro.Editor.Tests", "Unity.TextMeshPro.Tests" };
     }
