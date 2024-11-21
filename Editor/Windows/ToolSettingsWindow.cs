@@ -51,7 +51,11 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
             Settings.Instance.ModsFolderPath = EditorGUILayout.TextField("Mods Folder Path", Settings.Instance.ModsFolderPath);
             Settings.Instance.BepinexFolderPath = EditorGUILayout.TextField("BepInEx Folder Path", Settings.Instance.BepinexFolderPath);
             Settings.Instance.TempPath = EditorGUILayout.TextField("Temp Path", Settings.Instance.TempPath);
+
+            GUILayout.Space(10);
+            GUILayout.Label("Publish Settings", EditorStyles.boldLabel);
             Settings.Instance.PublishPath = EditorGUILayout.TextField("Publish Path", Settings.Instance.PublishPath);
+            Settings.Instance.PublishFolderCopyTo = EditorGUILayout.TextField("Publish Folder Copy To", Settings.Instance.PublishFolderCopyTo);
 
             GUILayout.Space(10);
             GUILayout.Label("Mod Template Settings", EditorStyles.boldLabel);

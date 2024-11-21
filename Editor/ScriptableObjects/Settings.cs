@@ -10,7 +10,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public string ModsFolderPath = "Scripts\\Mods";
         public string BepinexFolderPath = "Scripts\\Mods\\Bepinex and Harmony";
         public string TempPath = $"{Path.GetTempPath()}UnityRoundsModdingTools";
+
+        [Header("Settings for Publishing Mod")]
         public string PublishPath = "Publish";
+        public string PublishFolderCopyTo = "";
 
         [Header("Settings for Creating Mod")]
         public string TemplatePath = "https://github.com/RoundsModdingTools/UnityRoundsModTemplate";
