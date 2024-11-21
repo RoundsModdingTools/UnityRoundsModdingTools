@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -62,11 +62,17 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
             Settings.Instance.TemplatePath = EditorGUILayout.TextField("Template Path", Settings.Instance.TemplatePath);
             Settings.Instance.TemplateOutputPath = EditorGUILayout.TextField("Template Output Path", Settings.Instance.TemplateOutputPath);
 
+
             GUILayout.Space(10);
             GUILayout.Label("Mappings", EditorStyles.boldLabel);
+            if(File.Exists("Assets/Editor/CsprojPostprocessor.cs")) {
+                EditorGUILayout.HelpBox("The original CsprojPostprocessor.cs file has been found. Please remove or rename the file extension to use this feature.", MessageType.Error);
+                GUI.enabled = false;
+            }
             projectMappingsList.DoLayoutList();
             GUILayout.Space(10);
             folderMappingsList.DoLayoutList();
+            GUI.enabled = true;
 
             GUILayout.Space(10);
             if(GUILayout.Button("Recompile")) {
@@ -103,7 +109,7 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
                 // Get the current ModName
                 SerializedProperty modNameProperty = element.FindPropertyRelative("ModName");
                 DrawAssemblyDefinitionProperty(modNameProperty, rect);
-                
+
                 // AssetBundleName field
                 EditorGUI.PropertyField(
                     new Rect(rect.x + halfWidth + 10, rect.y, halfWidth, EditorGUIUtility.singleLineHeight),
