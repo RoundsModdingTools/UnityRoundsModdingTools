@@ -1,8 +1,6 @@
 ﻿using BepInEx;
 using Newtonsoft.Json;
-using System;
 using System.IO;
-using System.IO.Compression;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -96,69 +94,9 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             }
 
             if(GUILayout.Button("Publish") && !modName.stringValue.IsNullOrWhiteSpace()) {
-                PublishMod(readmePath, iconPath);
+                modInfo.PublishMod();
                 EditorUtility.RevealInFinder(Path.Combine(Settings.Instance.PublishPath, modName.stringValue));
             }
-        }
-
-        private void PublishMod(string readmePath, string iconPath) {
-            ModInfo modInfo = (ModInfo)target;
-
-            string publishPath = Path.Combine(Settings.Instance.PublishPath, modInfo.ModName);
-
-            if(Directory.Exists(publishPath)) Directory.Delete(publishPath, true);
-            if(File.Exists($"{publishPath}.zip")) File.Delete($"{publishPath}.zip");
-
-            Directory.CreateDirectory(publishPath);
-
-            string DllObjPath = GetDLLObjPath(modInfo.ModAssemblyDefinition.Assembly.Location);
-
-            Manifest manifest = new Manifest {
-                ModName = modInfo.ModName,
-                Version = modInfo.Version,
-                WebsiteURL = modInfo.WebsiteURL,
-                Description = modInfo.Description,
-                Dependencies = modInfo.dependencies,
-            };
-
-            File.Copy(DllObjPath, Path.Combine(publishPath, Path.GetFileName(DllObjPath)));
-            File.WriteAllText(Path.Combine(publishPath, "manifest.json"), JsonConvert.SerializeObject(manifest, Formatting.Indented));
-            File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
-            File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
-
-            ZipFile.CreateFromDirectory(publishPath, $"{publishPath}.zip");
-
-            if (!Settings.Instance.PublishFolderCopyTo.IsNullOrWhiteSpace() && Directory.Exists(Settings.Instance.PublishFolderCopyTo)) {
-                string copyToPath = Path.Combine(Settings.Instance.PublishFolderCopyTo, $"Unknown-{modInfo.ModName}");
-                if(Directory.Exists(copyToPath)) Directory.Delete(copyToPath, true);
-
-                // Copy the folder to the specified path
-                FileSystemManager.CopyDirectory(publishPath, copyToPath, new string[] { }, new string[] { });
-            }
-        }
-
-        private string GetDLLObjPath(string dllPath) {
-            string debugDllPath = $"obj/Debug/{Path.GetFileName(dllPath)}";
-            string releaseDllPath = $"obj/Release/{Path.GetFileName(dllPath)}";
-
-            bool debugExists = File.Exists(debugDllPath);
-            bool releaseExists = File.Exists(releaseDllPath);
-
-            if(debugExists && releaseExists) {
-                DateTime debugLastModified = File.GetLastWriteTime(debugDllPath);
-                DateTime releaseLastModified = File.GetLastWriteTime(releaseDllPath);
-
-                if(debugLastModified > releaseLastModified) {
-                    return debugDllPath;
-                } else {
-                    return releaseDllPath;
-                }
-            }
-
-            if(debugExists) return debugDllPath;
-            if(releaseExists) return releaseDllPath;
-
-            return null;
         }
     }
 
