@@ -1,7 +1,10 @@
 ﻿using BepInEx;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityRoundsModdingTools.Editor.ScriptableObjects;
@@ -10,9 +13,60 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
     [CustomEditor(typeof(ModInfo))]
     internal class ModInfoInspector : UnityEditor.Editor {
         private ReorderableList dependenciesList;
+        private ReorderableList dllDependenciesList;
 
-        private void OnEnable() {
-            SerializedProperty dependenciesProperty = serializedObject.FindProperty("dependencies");
+        public void OnEnable() {
+            SerializedProperty dependenciesProperty = serializedObject.FindProperty(nameof(ModInfo.Dependencies));
+            SetupDependenciesList(dependenciesProperty);
+            SerializedProperty dllDependenciesProperty = serializedObject.FindProperty(nameof(ModInfo.DllDependencies));
+            SetupDllDependenciesList(dllDependenciesProperty);
+        }
+
+        void SetupDllDependenciesList(SerializedProperty dllDependenciesProperty) {
+            ModInfo modInfo = (ModInfo)target;
+
+            dllDependenciesList = new ReorderableList(serializedObject, dllDependenciesProperty, true, true, true, true);
+
+            dllDependenciesList.drawHeaderCallback = rect => {
+                EditorGUI.LabelField(rect, "DLL Dependencies");
+            };
+            dllDependenciesList.drawElementCallback = (rect, index, isActive, isFocused) => {
+                SerializedProperty element = dllDependenciesProperty.GetArrayElementAtIndex(index);
+                rect.y += 2;
+
+                rect.height = EditorGUIUtility.singleLineHeight;
+
+                List<string> availablePrecompiledAssemblies = CompilationPipeline.GetPrecompiledAssemblyNames()
+                    .OrderBy(x => x)
+                    .ToList();
+
+                List<GUIContent> availablePrecompiledAssembliesContent = availablePrecompiledAssemblies.Select(x => new GUIContent(x)).ToList();
+
+
+                int selectedIndex = availablePrecompiledAssemblies.IndexOf(modInfo.DllDependencies[index]);
+                if(selectedIndex == -1) {
+                    availablePrecompiledAssembliesContent.Insert(0, new GUIContent("None"));
+                    selectedIndex = 0;
+                }
+
+                modInfo.DllDependencies[index] = availablePrecompiledAssembliesContent[EditorGUI.Popup(rect, selectedIndex, availablePrecompiledAssembliesContent.ToArray())].text;
+            };
+            dllDependenciesList.onAddCallback = list => {
+                int index = dllDependenciesProperty.arraySize;
+                dllDependenciesProperty.InsertArrayElementAtIndex(index);
+                SerializedProperty newElement = dllDependenciesProperty.GetArrayElementAtIndex(index);
+                newElement.stringValue = string.Empty;
+                serializedObject.ApplyModifiedProperties();
+            };
+            dllDependenciesList.onRemoveCallback = list => {
+                if(dllDependenciesProperty.arraySize > 0) {
+                    dllDependenciesProperty.DeleteArrayElementAtIndex(list.index);
+                    serializedObject.ApplyModifiedProperties();
+                }
+            };
+        }
+
+        void SetupDependenciesList(SerializedProperty dependenciesProperty) {
             dependenciesList = new ReorderableList(serializedObject, dependenciesProperty, true, true, true, true);
 
             dependenciesList.drawHeaderCallback = rect => {
@@ -23,6 +77,7 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
                 SerializedProperty element = dependenciesProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
                 rect.height = EditorGUIUtility.singleLineHeight;
+
                 EditorGUI.PropertyField(rect, element, GUIContent.none);
             };
 
@@ -76,6 +131,7 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
 
             GUILayout.Space(10);
             dependenciesList.DoLayoutList();
+            dllDependenciesList.DoLayoutList();
 
             if(GUILayout.Button("Save")) {
                 serializedObject.ApplyModifiedProperties();
@@ -87,10 +143,10 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             string iconPath = Path.Combine(modDirectory, "icon.png");
 
             if(!File.Exists(readmePath)) {
-                EditorGUILayout.HelpBox("README file not found. Please create one.", MessageType.Error);
+                EditorGUILayout.HelpBox("README file not found. Recommend creating one.", MessageType.Warning);
             }
             if(!File.Exists(iconPath)) {
-                EditorGUILayout.HelpBox("Icon file not found. Please create one.", MessageType.Error);
+                EditorGUILayout.HelpBox("Icon file not found. Recommend creating one.", MessageType.Warning);
             }
 
             if(GUILayout.Button("Publish") && !modName.stringValue.IsNullOrWhiteSpace()) {
@@ -106,6 +162,6 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
         [JsonProperty("version_number")] public string Version;
         [JsonProperty("website_url")] public string WebsiteURL;
         [JsonProperty("description")] public string Description;
-        [JsonProperty("dependencies")] public string[] Dependencies;
+        [JsonProperty("dependencies")] public List<string> Dependencies;
     }
 }
