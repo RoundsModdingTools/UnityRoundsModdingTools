@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
-using System.IO;
-using UnityEditor.Compilation;
-using System.Reflection;
-using Newtonsoft.Json;
-using System;
-using UnityEngine;
 
 namespace UnityRoundsModdingTools.Editor.Utils.Template {
     public interface ITemplateHandler {
@@ -31,7 +28,7 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
                 templateHandlers[handlerEntry.Key] = (ITemplateHandler)JsonConvert.DeserializeObject(serializedArgs, templateHandlerType);
                 try {
                     templateHandlers[handlerEntry.Key].AfterTemplateCompile();
-                } catch (Exception e) {
+                } catch(Exception e) {
                     UnityEngine.Debug.LogError($"Error while running AfterTemplateCompile for '{handlerEntry.Key}': {e}");
                 }
                 EditorPrefs.DeleteKey($"Template_{handlerEntry.Key}_Serialized");
@@ -49,8 +46,8 @@ namespace UnityRoundsModdingTools.Editor.Utils.Template {
 
             var processedTemplates = ProcessTemplatesInFiles(destinationPath, handlerKey);
             foreach(var fileEntry in processedTemplates) {
-                File.WriteAllText(ApplyTemplate(handlerKey, 
-                    Path.Combine(Directory.GetParent(Path.GetFullPath(fileEntry.Key)).FullName, 
+                File.WriteAllText(ApplyTemplate(handlerKey,
+                    Path.Combine(Directory.GetParent(Path.GetFullPath(fileEntry.Key)).FullName,
                     Path.GetFileNameWithoutExtension(fileEntry.Key))
                 ), fileEntry.Value);
 

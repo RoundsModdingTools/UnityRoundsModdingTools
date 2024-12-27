@@ -1,5 +1,5 @@
-﻿using Assets.Plugins.UnityRoundsModdingTools.Editor.Windows;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityRoundsModdingTools.Editor.Windows;
 
 namespace UnityRoundsModdingTools.Editor.Providers {
     internal static class ToolSettingsProvider {

@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityRoundsModdingTools.Editor.ScriptableObjects;
 using UnityRoundsModdingTools.Editor.Utils;
 
-namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
+namespace UnityRoundsModdingTools.Editor.Windows {
     public class ToolSettingsWindow : EditorWindow {
         private static Vector2 scrollPosition;
 
