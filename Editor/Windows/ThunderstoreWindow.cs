@@ -36,10 +36,6 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             }
         }
 
-        private bool isSearchQueryDifferent() {
-            return previousSearchQuery != searchQuery;
-        }
-
         private void OnGUI() {
             EditorPrefs.SetString("ThunderstoreSearchQuery", searchQuery);
             EditorPrefs.SetInt("ThunderstoreSortType", (int)sortType);
