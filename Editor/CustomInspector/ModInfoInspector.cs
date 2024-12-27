@@ -133,9 +133,9 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             dependenciesList.DoLayoutList();
             dllDependenciesList.DoLayoutList();
 
-            if(GUILayout.Button("Save")) {
+            if(GUI.changed) {
                 serializedObject.ApplyModifiedProperties();
-                AssetDatabase.SaveAssets();
+                EditorUtility.SetDirty(modInfo);
             }
 
             string modDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(modInfo));

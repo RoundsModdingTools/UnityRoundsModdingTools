@@ -77,10 +77,10 @@ namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Windows {
             GUI.enabled = true;
 
             GUILayout.Space(10);
-            if(GUILayout.Button("Save Settings")) {
+            if(GUI.changed) {
                 settingsSerializedObject.ApplyModifiedProperties();
-                ProjectMappings.Save();
-                Settings.Save();
+                ProjectMappings.MarkDirty();
+                Settings.MarkDirty();
             }
             if(GUILayout.Button("Recompile")) {
                 var editorAssembly = Assembly.GetAssembly(typeof(UnityEditor.Editor));

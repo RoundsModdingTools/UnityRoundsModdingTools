@@ -42,6 +42,13 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             Debug.Log($"Created and saved new instance of {typeof(T).Name} at {path}");
         }
 
+        public static void MarkDirty() {
+            if(instance == null) {
+                Debug.LogError($"Cannot mark {typeof(T).Name} instance as dirty because it is null.");
+                return;
+            }
+            EditorUtility.SetDirty(instance);
+        }
         public static void Save() {
             if(instance == null) {
                 Debug.LogError($"Cannot save {typeof(T).Name} instance because it is null.");
