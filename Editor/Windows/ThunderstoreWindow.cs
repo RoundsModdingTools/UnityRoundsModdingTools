@@ -30,9 +30,9 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             previousSortType = sortType;
 
             if(packages.Count == 0) {
-                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, "rounds");
+                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, "rounds").ToList();
                 packages.RemoveAll(package => package.FullName == "ebkr-r2modman");
-                packages = packages.Take(50).ToList();
+                packages = packages.Take(200).ToList();
             }
         }
 
@@ -49,12 +49,11 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Search:", GUILayout.Width(50));
             searchQuery = EditorGUILayout.TextField(searchQuery);
-            if((GUILayout.Button("Search", GUILayout.Width(60)) || Event.current.keyCode == KeyCode.Return) &&
-                (previousSearchQuery != searchQuery || previousSortType != sortType)) {
+            if(previousSearchQuery != searchQuery || previousSortType != sortType) {
 
-                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, "rounds");
+                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, "rounds").ToList();
                 packages.RemoveAll(package => package.FullName == "ebkr-r2modman");
-                packages = packages.Take(50).ToList();
+                packages = packages.Take(200).ToList();
 
                 previousSearchQuery = searchQuery;
                 previousSortType = sortType;
@@ -95,7 +94,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                     if(GUILayout.Button("Open", GUILayout.MaxWidth(50), GUILayout.MaxHeight(15))) {
                         Application.OpenURL($"https://thunderstore.io/c/rounds/p/{package.Owner}/{package.Name}/");
                     }
-                });
+                }, (int)position.height - 20);
             }
         }
     }

@@ -12,8 +12,8 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
     }
 
     public static class ThunderstoreAPIExtension {
-        public static List<Package> SearchPackage(this ThunderstoreAPI api, string searchTerm, PackageSortType sortType, string community) {
-            List<Package> packages = api.GetPackages(community);
+        public static Package[] SearchPackage(this ThunderstoreAPI api, string searchTerm, PackageSortType sortType, string community) {
+            Package[] packages = api.GetPackages(community);
 
             IEnumerable<Package> filteredPackages =
                 from package in packages
@@ -24,7 +24,7 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
 
             filteredPackages = filteredPackages.SortPackages(sortType);
 
-            return filteredPackages.ToList();
+            return filteredPackages.ToArray();
         }
 
         private static IEnumerable<Package> SortPackages(this IEnumerable<Package> packages, PackageSortType sortType) {
