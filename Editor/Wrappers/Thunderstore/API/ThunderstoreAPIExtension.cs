@@ -12,13 +12,14 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
     }
 
     public static class ThunderstoreAPIExtension {
-        public static Package[] SearchPackage(this ThunderstoreAPI api, string searchTerm, PackageSortType sortType, string community) {
+        public static Package[] SearchPackage(this ThunderstoreAPI api, string searchTerm, PackageSortType sortType, string[] categories, string community) {
             Package[] packages = api.GetPackages(community);
 
             IEnumerable<Package> filteredPackages =
                 from package in packages
-                where package.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
-                   || package.FullName.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                where (package.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0
+                   || package.FullName.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
+                   && (categories == null || categories.Length == 0 || categories.All(category => package.Categories.Contains(category)))
                 select package;
 
 

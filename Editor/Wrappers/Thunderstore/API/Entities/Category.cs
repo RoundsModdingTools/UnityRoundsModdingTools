@@ -1,6 +1,8 @@
-﻿namespace UnityRoundsModdingTools.Editor.Thunderstore.API.Entities {
+﻿using Newtonsoft.Json;
+
+namespace UnityRoundsModdingTools.Editor.Thunderstore.API.Entities {
     public struct Category {
-        public string name;
-        public string slug;
+        [JsonProperty("name")] public string Name;
+        [JsonProperty("slug")] public string Slug;
     }
 }

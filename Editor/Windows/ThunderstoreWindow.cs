@@ -12,6 +12,9 @@ namespace UnityRoundsModdingTools.Editor.Windows {
         private static ThunderstoreAPI thunderstoreAPI = new ThunderstoreAPI();
         private static List<Package> packages = new List<Package>();
 
+        private static List<bool> selectedCategories = new List<bool>();
+        private static List<Category> categories = new List<Category>();
+
         private string searchQuery = "";
         private string previousSearchQuery = "";
 
@@ -30,9 +33,17 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             previousSortType = sortType;
 
             if(packages.Count == 0) {
-                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, "rounds").ToList();
+                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, null, "rounds").ToList();
                 packages.RemoveAll(package => package.FullName == "ebkr-r2modman");
                 packages = packages.Take(200).ToList();
+            }
+
+            if(categories.Count == 0) {
+                categories = thunderstoreAPI.GetCategories("rounds").ToList();
+                selectedCategories = new List<bool>(categories.Count);
+                for(int i = 0; i < categories.Count; i++) {
+                    selectedCategories.Add(false);
+                }
             }
         }
 
@@ -45,17 +56,21 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Search:", GUILayout.Width(50));
             searchQuery = EditorGUILayout.TextField(searchQuery);
-            if(previousSearchQuery != searchQuery || previousSortType != sortType) {
 
-                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, "rounds").ToList();
+                string[] selectedCategoryNames = categories.Where((category, index) => selectedCategories[index]).Select(category => category.Name).ToArray();
+
+                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, selectedCategoryNames, "rounds").ToList();
                 packages.RemoveAll(package => package.FullName == "ebkr-r2modman");
                 packages = packages.Take(200).ToList();
 
                 previousSearchQuery = searchQuery;
                 previousSortType = sortType;
-            }
+
             GUILayout.EndHorizontal();
             sortType = (PackageSortType)EditorGUILayout.EnumPopup("Sort by:", sortType);
+
+            string[] categoryNames = categories.Select(category => category.Name).ToArray();
+            GUIUtils.CreateMultSelectDropdown("Categories", categories.Select(category => category.Name).ToList(), selectedCategories);
 
             GUILayout.Space(10);
 

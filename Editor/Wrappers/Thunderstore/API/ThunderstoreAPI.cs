@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using UnityRoundsModdingTools.Editor.Thunderstore.API.Entities;
 
@@ -10,13 +11,8 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
         private const string THUNDERSTORE_API_URL = "https://thunderstore.io";
         
         private struct CategoryResponse {
-            public CategoryResult results;
+            public Category[] results;
         }
-
-        private struct CategoryResult {
-            public Category[] categories;
-        }
-
 
 
         public TimeSpan cacheDuration = TimeSpan.FromMinutes(5);
@@ -25,8 +21,6 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
         private DateTimeOffset lastFetchTime;
 
         public Package[] GetPackages(string community) {
-            UnityEngine.Debug.Log("Fetching packages from Thunderstore...");
-
             using(var client = new HttpClient()) {
                 if(cachedPackages != null && DateTimeOffset.Now - lastFetchTime < cacheDuration) {
                     return cachedPackages;
@@ -45,13 +39,12 @@ namespace UnityRoundsModdingTools.Editor.Thunderstore.API {
         }
 
         public Category[] GetCategories(string community) {
-            UnityEngine.Debug.Log("Fetching categories from Thunderstore...");
             using(var client = new HttpClient()) {
-                var url = $"{THUNDERSTORE_API_URL}/api/experimental/{community}/rounds/category/";
+                var url = $"{THUNDERSTORE_API_URL}/api/experimental/community/{community}/category/";
                 var response = client.GetAsync(url).Result;
                 var content = response.Content.ReadAsStringAsync().Result;
                 CategoryResponse categoryResponse = JsonConvert.DeserializeObject<CategoryResponse>(content);
-                return categoryResponse.results.categories;
+                return categoryResponse.results;
             }
         }
     }
