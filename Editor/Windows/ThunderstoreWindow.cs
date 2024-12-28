@@ -57,20 +57,20 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             GUILayout.Label("Search:", GUILayout.Width(50));
             searchQuery = EditorGUILayout.TextField(searchQuery);
 
-                string[] selectedCategoryNames = categories.Where((category, index) => selectedCategories[index]).Select(category => category.Name).ToArray();
+            string[] selectedCategoryNames = categories.Where((category, index) => selectedCategories[index]).Select(category => category.Name).ToArray();
 
-                packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, selectedCategoryNames, "rounds").ToList();
-                packages.RemoveAll(package => package.FullName == "ebkr-r2modman");
-                packages = packages.Take(200).ToList();
+            packages = thunderstoreAPI.SearchPackage(searchQuery, sortType, selectedCategoryNames, "rounds").ToList();
+            packages.RemoveAll(package => package.FullName == "ebkr-r2modman");
+            packages = packages.Take(200).ToList();
 
-                previousSearchQuery = searchQuery;
-                previousSortType = sortType;
+            previousSearchQuery = searchQuery;
+            previousSortType = sortType;
 
             GUILayout.EndHorizontal();
             sortType = (PackageSortType)EditorGUILayout.EnumPopup("Sort by:", sortType);
 
             string[] categoryNames = categories.Select(category => category.Name).ToArray();
-            GUIUtils.CreateMultSelectDropdown("Categories", categories.Select(category => category.Name).ToList(), selectedCategories);
+            GUIUtils.CreateMultSelectDropdown("Whitelest Channel:", "Categories", categories.Select(category => category.Name).ToList(), selectedCategories);
 
             GUILayout.Space(10);
 
