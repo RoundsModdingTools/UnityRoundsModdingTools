@@ -2,6 +2,8 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditorInternal;
 
 namespace UnityRoundsModdingTools.Editor.Utils {
     // Multi-Select Popup Class
@@ -135,5 +137,25 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             GUILayout.EndHorizontal();
         }
 
+        public static void DrawAssemblyDefinitionProperty(SerializedProperty property, Rect rect, float width) {
+            string currentAssemblyName = property.stringValue;
+
+            // Find the current assembly definition
+            AssemblyDefinition currentAssemblyDefinition = AssemblyDefinition.All.FirstOrDefault(x => x.Name == currentAssemblyName);
+            AssemblyDefinitionAsset currentAssemblyAsset = currentAssemblyDefinition != null ? AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(currentAssemblyDefinition.AssemblyPath) : null;
+
+            // Create ObjectField for selecting AssemblyDefinitionAsset
+            AssemblyDefinitionAsset newAssemblyAsset = (AssemblyDefinitionAsset)EditorGUI.ObjectField(
+                new Rect(rect.x, rect.y, width, EditorGUIUtility.singleLineHeight),
+                currentAssemblyAsset,
+                typeof(AssemblyDefinitionAsset),
+                false
+            );
+
+            // Update AssemblyName if a new assembly is selected
+            if(newAssemblyAsset != null && newAssemblyAsset != currentAssemblyAsset) {
+                property.stringValue = AssemblyDefinition.LoadFromAssemblyDefinitionAsset(newAssemblyAsset).Name;
+            }
+        }
     }
 }

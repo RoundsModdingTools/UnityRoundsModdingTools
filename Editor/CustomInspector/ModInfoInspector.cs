@@ -8,18 +8,23 @@ using UnityEditor.Compilation;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityRoundsModdingTools.Editor.ScriptableObjects;
+using UnityRoundsModdingTools.Editor.Utils;
 
 namespace UnityRoundsModdingTools.Editor.CustomInspector {
     [CustomEditor(typeof(ModInfo))]
     internal class ModInfoInspector : UnityEditor.Editor {
         private ReorderableList dependenciesList;
+
         private ReorderableList dllDependenciesList;
+        private ReorderableList assemblyDefinitionDependenciesList;
 
         public void OnEnable() {
             SerializedProperty dependenciesProperty = serializedObject.FindProperty(nameof(ModInfo.Dependencies));
             SetupDependenciesList(dependenciesProperty);
             SerializedProperty dllDependenciesProperty = serializedObject.FindProperty(nameof(ModInfo.DllDependencies));
             SetupDllDependenciesList(dllDependenciesProperty);
+            SerializedProperty assemblyDefinitionDependenciesProperty = serializedObject.FindProperty(nameof(ModInfo.AssemblyDefinitionDependencies));
+            SetupAssemblyDefinitionDependenciesList(assemblyDefinitionDependenciesProperty);
         }
 
         void SetupDllDependenciesList(SerializedProperty dllDependenciesProperty) {
@@ -97,6 +102,32 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             };
         }
 
+        void SetupAssemblyDefinitionDependenciesList(SerializedProperty assemblyDefinitionDependenciesProperty) {
+            assemblyDefinitionDependenciesList = new ReorderableList(serializedObject, assemblyDefinitionDependenciesProperty, true, true, true, true);
+            assemblyDefinitionDependenciesList.drawHeaderCallback = rect => {
+                EditorGUI.LabelField(rect, "AssemblyDefinition Dependencies");
+            };
+            assemblyDefinitionDependenciesList.drawElementCallback = (rect, index, isActive, isFocused) => {
+                var element = assemblyDefinitionDependenciesProperty.GetArrayElementAtIndex(index);
+                rect.y += 2;
+                float halfWidth = rect.width / 2 - 10;
+
+                // Get the current AssemblyName
+                GUIUtils.DrawAssemblyDefinitionProperty(element, rect, rect.width - 10);
+            };
+            assemblyDefinitionDependenciesList.onAddCallback = list => {
+                var index = list.serializedProperty.arraySize;
+                list.serializedProperty.arraySize++;
+                list.index = index;
+
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                element.stringValue = "";
+            };
+            assemblyDefinitionDependenciesList.onRemoveCallback = list => {
+                list.serializedProperty.DeleteArrayElementAtIndex(list.index);
+            };
+        }
+
         public override void OnInspectorGUI() {
             ModInfo modInfo = (ModInfo)target;
             if(modInfo.ModAssemblyDefinition == null) {
@@ -132,6 +163,7 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
             GUILayout.Space(10);
             dependenciesList.DoLayoutList();
             dllDependenciesList.DoLayoutList();
+            assemblyDefinitionDependenciesList.DoLayoutList();
 
             if(GUI.changed) {
                 serializedObject.ApplyModifiedProperties();

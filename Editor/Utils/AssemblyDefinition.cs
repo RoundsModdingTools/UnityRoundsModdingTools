@@ -95,6 +95,11 @@ namespace UnityRoundsModdingTools.Editor.Utils {
             return assemblyDefinitionClass;
         }
 
+        public static AssemblyDefinition LoadFromName(string assemblyName) {
+            AssemblyDefinition assemblyDefinition = All.FirstOrDefault(x => x.Name == assemblyName);
+            return assemblyDefinition;
+        }
+
         public void Save() {
             if(AssemblyPath == null) throw new IOException("Path is not set for AssemblyDefinition");
 

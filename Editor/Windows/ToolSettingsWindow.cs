@@ -116,7 +116,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
 
                 // Get the current ModName
                 SerializedProperty modNameProperty = element.FindPropertyRelative("ModName");
-                DrawAssemblyDefinitionProperty(modNameProperty, rect);
+                GUIUtils.DrawAssemblyDefinitionProperty(modNameProperty, rect, rect.width / 2 - 10);
 
                 // AssetBundleName field
                 EditorGUI.PropertyField(
@@ -156,7 +156,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
 
                 // Get the current AssemblyName
                 SerializedProperty assemblyNameProperty = element.FindPropertyRelative("AssemblyName");
-                DrawAssemblyDefinitionProperty(assemblyNameProperty, rect);
+                GUIUtils.DrawAssemblyDefinitionProperty(assemblyNameProperty, rect, rect.width / 2 - 10);
 
                 // FolderName field
                 EditorGUI.PropertyField(
@@ -182,28 +182,6 @@ namespace UnityRoundsModdingTools.Editor.Windows {
                 list.serializedProperty.DeleteArrayElementAtIndex(list.index);
                 settingsSerializedObject.ApplyModifiedProperties();
             };
-        }
-
-        private void DrawAssemblyDefinitionProperty(SerializedProperty property, Rect rect) {
-            string currentAssemblyName = property.stringValue;
-            float halfWidth = rect.width / 2 - 10;
-
-            // Find the current assembly definition
-            AssemblyDefinition currentAssemblyDefinition = AssemblyDefinition.All.FirstOrDefault(x => x.Name == currentAssemblyName);
-            AssemblyDefinitionAsset currentAssemblyAsset = currentAssemblyDefinition != null ? AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(currentAssemblyDefinition.AssemblyPath) : null;
-
-            // Create ObjectField for selecting AssemblyDefinitionAsset
-            AssemblyDefinitionAsset newAssemblyAsset = (AssemblyDefinitionAsset)EditorGUI.ObjectField(
-                new Rect(rect.x, rect.y, halfWidth, EditorGUIUtility.singleLineHeight),
-                currentAssemblyAsset,
-                typeof(AssemblyDefinitionAsset),
-                false
-            );
-
-            // Update AssemblyName if a new assembly is selected
-            if(newAssemblyAsset != null && newAssemblyAsset != currentAssemblyAsset) {
-                property.stringValue = AssemblyDefinition.LoadFromAssemblyDefinitionAsset(newAssemblyAsset).Name;
-            }
         }
     }
 }

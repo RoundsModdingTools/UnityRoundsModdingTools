@@ -19,7 +19,9 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public string WebsiteURL;
         public string Description;
         public List<string> Dependencies = new List<string>();
+
         public List<string> DllDependencies = new List<string>();
+        public List<string> AssemblyDefinitionDependencies = new List<string>();
 
         public AssemblyDefinition ModAssemblyDefinition {
             get {
@@ -44,7 +46,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             if(Directory.Exists(publishPath)) Directory.Delete(publishPath, true);
             if(File.Exists($"{publishPath}.zip")) File.Delete($"{publishPath}.zip");
             Directory.CreateDirectory(publishPath);
-
+            
             string DllObjPath = GetDLLObjPath(ModAssemblyDefinition.Assembly.Location);
 
             Manifest manifest = new Manifest {
@@ -57,10 +59,9 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
 
             File.WriteAllText(Path.Combine(publishPath, "manifest.json"), JsonConvert.SerializeObject(manifest, Formatting.Indented));
 
-            if(DllObjPath != null) {
-                Directory.CreateDirectory(Path.Combine(publishPath, "plugins"));
-                File.Copy(DllObjPath, Path.Combine(publishPath, "plugins", Path.GetFileName(DllObjPath)));
-            }
+            Directory.CreateDirectory(Path.Combine(publishPath, "plugins"));
+            File.Copy(DllObjPath, Path.Combine(publishPath, "plugins", Path.GetFileName(DllObjPath)));
+
             if(File.Exists(readmePath)) File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
             if(File.Exists(iconPath)) File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
             if(File.Exists(changelogPath)) File.Copy(changelogPath, Path.Combine(publishPath, "CHANGELOG.md"));
@@ -73,6 +74,17 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
                 }
             }
 
+            if(AssemblyDefinitionDependencies != null && AssemblyDefinitionDependencies.Count > 0) {
+                if (!Directory.Exists(Path.Combine(publishPath, "dependencies"))) {
+                    Directory.CreateDirectory(Path.Combine(publishPath, "dependencies"));
+                }
+                foreach(string assemblyDefinitionDependency in AssemblyDefinitionDependencies) {
+                    AssemblyDefinition assemblyDefinition = AssemblyDefinition.LoadFromName(assemblyDefinitionDependency);
+                    string dllPath = GetDLLObjPath(assemblyDefinition.Assembly.Location);
+
+                    File.Copy(dllPath, Path.Combine(publishPath, "dependencies", $"{assemblyDefinition.Name}.dll"));
+                }
+            }
 
             ZipFile.CreateFromDirectory(publishPath, $"{publishPath}.zip");
 
@@ -106,7 +118,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             if(debugExists) return debugDllPath;
             if(releaseExists) return releaseDllPath;
 
-            return null;
+            return dllPath;
         }
     }
 }
