@@ -47,7 +47,6 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             if(File.Exists($"{publishPath}.zip")) File.Delete($"{publishPath}.zip");
             Directory.CreateDirectory(publishPath);
             
-            string DllObjPath = GetDLLObjPath(ModAssemblyDefinition.Assembly.Location);
 
             Manifest manifest = new Manifest {
                 ModName = ModName,
@@ -60,7 +59,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             File.WriteAllText(Path.Combine(publishPath, "manifest.json"), JsonConvert.SerializeObject(manifest, Formatting.Indented));
 
             Directory.CreateDirectory(Path.Combine(publishPath, "plugins"));
-            File.Copy(DllObjPath, Path.Combine(publishPath, "plugins", Path.GetFileName(DllObjPath)));
+            if(ModAssemblyDefinition != null) {
+                string DllObjPath = GetDLLObjPath(ModAssemblyDefinition.Assembly.Location);
+                File.Copy(DllObjPath, Path.Combine(publishPath, "plugins", Path.GetFileName(DllObjPath)));
+            }
 
             if(File.Exists(readmePath)) File.Copy(readmePath, Path.Combine(publishPath, "README.md"));
             if(File.Exists(iconPath)) File.Copy(iconPath, Path.Combine(publishPath, "icon.png"));
@@ -75,14 +77,14 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             }
 
             if(AssemblyDefinitionDependencies != null && AssemblyDefinitionDependencies.Count > 0) {
-                if (!Directory.Exists(Path.Combine(publishPath, "dependencies"))) {
+                if (!Directory.Exists(Path.Combine(publishPath, "dependencies")) && ModAssemblyDefinition != null) {
                     Directory.CreateDirectory(Path.Combine(publishPath, "dependencies"));
                 }
                 foreach(string assemblyDefinitionDependency in AssemblyDefinitionDependencies) {
                     AssemblyDefinition assemblyDefinition = AssemblyDefinition.LoadFromName(assemblyDefinitionDependency);
                     string dllPath = GetDLLObjPath(assemblyDefinition.Assembly.Location);
 
-                    File.Copy(dllPath, Path.Combine(publishPath, "dependencies", $"{assemblyDefinition.Name}.dll"));
+                    File.Copy(dllPath, Path.Combine(publishPath, ModAssemblyDefinition != null ? "dependencies" : "plugins", $"{assemblyDefinition.Name}.dll"));
                 }
             }
 

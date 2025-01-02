@@ -130,10 +130,6 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
 
         public override void OnInspectorGUI() {
             ModInfo modInfo = (ModInfo)target;
-            if(modInfo.ModAssemblyDefinition == null) {
-                EditorGUILayout.HelpBox("Assembly Definition not found. Please create one.", MessageType.Error);
-                return;
-            }
 
             SerializedProperty modName = serializedObject.FindProperty("ModName");
             SerializedProperty version = serializedObject.FindProperty("Version");
