@@ -181,6 +181,10 @@ namespace UnityRoundsModdingTools.Editor.CustomInspector {
                 modInfo.PublishMod();
                 EditorUtility.RevealInFinder(Path.Combine(Settings.Instance.PublishPath, modName.stringValue));
             }
+
+            if(modInfo.ModAssemblyDefinition == null) {
+                EditorGUILayout.HelpBox("The mod's Assembly Definition was not found in the root directory. As a result, the \"Assembly Definition Dependencies\" will apply to the \"plugins\" folder instead of the \"dependencies\" folder.", MessageType.Info);
+            }
         }
     }
 
