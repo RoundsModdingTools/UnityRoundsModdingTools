@@ -11,7 +11,7 @@ namespace UnityRoundsModdingTools.Editor.Utils {
     public static class MainThreadAction {
         private static readonly ConcurrentQueue<Action> MainThreadActions = new ConcurrentQueue<Action>();
 
-        public static void Enqueue(Action action) {
+        public static void Invoke(Action action) {
             MainThreadActions.Enqueue(action);
         }
 

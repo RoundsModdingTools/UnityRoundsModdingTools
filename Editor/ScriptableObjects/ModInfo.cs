@@ -44,10 +44,10 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         }
 
         private void OnFileChanged(object sender, FileSystemEventArgs e) {
-            if(!WatchedFiles.Contains(e.FullPath)) return;
+            if(!Settings.Instance.AutoPublish || !WatchedFiles.Contains(e.FullPath)) return;
 
             UnityEngine.Debug.Log($"Detected file change, republishing mod '{ModName}'");
-            MainThreadAction.Enqueue(PublishMod);
+            MainThreadAction.Invoke(PublishMod);
         }
 
         public static void PublishAll() {
