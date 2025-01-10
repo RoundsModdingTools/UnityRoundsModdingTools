@@ -58,6 +58,7 @@ namespace UnityRoundsModdingTools.Editor.Windows {
             GUILayout.Label("Publish Settings", EditorStyles.boldLabel);
             Settings.Instance.PublishPath = EditorGUILayout.TextField("Publish Path", Settings.Instance.PublishPath);
             Settings.Instance.PublishFolderCopyTo = EditorGUILayout.TextField("Publish Folder Copy To", Settings.Instance.PublishFolderCopyTo);
+            Settings.Instance.AutoPublish = EditorGUILayout.Toggle("Auto Publish", Settings.Instance.AutoPublish);
 
             GUILayout.Space(10);
             GUILayout.Label("Mod Template Settings", EditorStyles.boldLabel);

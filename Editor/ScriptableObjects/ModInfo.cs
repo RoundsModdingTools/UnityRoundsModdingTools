@@ -1,11 +1,12 @@
 ﻿using BepInEx;
+using Boo.Lang.Runtime.DynamicDispatching;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
@@ -15,6 +16,15 @@ using UnityRoundsModdingTools.Editor.Utils;
 namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
     [CreateAssetMenu(fileName = "ModInfo", menuName = "Unity Rounds Modding Tools/Mod Info", order = 0)]
     public class ModInfo : ScriptableObject {
+        private FileSystemWatcher FileSystemWatcher = new FileSystemWatcher {
+            Path = Path.Combine("obj"),
+            Filter = "*.dll",
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
+            IncludeSubdirectories = true,
+            EnableRaisingEvents = true,
+        };
+        private List<string> WatchedFiles = new List<string>();
+
         public string ModName;
         public string Version = "1.0.0";
         public string WebsiteURL;
@@ -24,15 +34,52 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         public List<string> DllDependencies = new List<string>();
         public List<string> AssemblyDefinitionDependencies = new List<string>();
 
+        public void OnEnable() {
+            FileSystemWatcher.Changed += OnFileChanged;
+            
+            WatchedFiles.Clear();
+            if(ModAssemblyDefinition != null) {
+                WatchedFiles.Add(Path.GetFullPath(GetDLLObjPath(ModAssemblyDefinition.Assembly.Location)));
+            }
+        }
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e) {
+            if(!WatchedFiles.Contains(e.FullPath)) return;
+
+            UnityEngine.Debug.Log($"Detected file change, republishing mod '{ModName}'");
+            MainThreadAction.Enqueue(PublishMod);
+        }
+
+        public static void PublishAll() {
+            string[] modInfoGuids = AssetDatabase.FindAssets("t:ModInfo");
+            List<ModInfo> modInfos = new List<ModInfo>();
+
+            foreach(string guid in modInfoGuids) {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                ModInfo modInfo = AssetDatabase.LoadAssetAtPath<ModInfo>(assetPath);
+                modInfos.Add(modInfo);
+            }
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            foreach(ModInfo modInfo in modInfos) {
+                modInfo.PublishMod();
+            }
+
+            stopwatch.Stop();
+            UnityEngine.Debug.Log($"Published {modInfos.Count} mods in {stopwatch.ElapsedMilliseconds}ms");
+        }
+
         public AssemblyDefinition ModAssemblyDefinition {
             get {
                 string assetPath = AssetDatabase.GetAssetPath(this);
                 string parentDirectoryPath = new FileInfo(assetPath).Directory.FullName;
 
                 string[] assemblyDefinitionPaths = Directory.GetFiles(parentDirectoryPath, "*.asmdef");
-                if(assemblyDefinitionPaths.Count() == 0)
-                    return null;
-                return AssemblyDefinition.Load(assemblyDefinitionPaths[0]);
+                return assemblyDefinitionPaths.Length > 0
+                    ? AssemblyDefinition.Load(assemblyDefinitionPaths[0])
+                    : null;
             }
         }
 
@@ -50,7 +97,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             if(Directory.Exists(publishPath)) Directory.Delete(publishPath, true);
             if(File.Exists($"{publishPath}.zip")) File.Delete($"{publishPath}.zip");
             Directory.CreateDirectory(publishPath);
-            
+
 
             Manifest manifest = new Manifest {
                 ModName = ModName,
@@ -81,7 +128,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
             }
 
             if(AssemblyDefinitionDependencies != null && AssemblyDefinitionDependencies.Count > 0) {
-                if (!Directory.Exists(Path.Combine(publishPath, "dependencies")) && ModAssemblyDefinition != null) {
+                if(!Directory.Exists(Path.Combine(publishPath, "dependencies")) && ModAssemblyDefinition != null) {
                     Directory.CreateDirectory(Path.Combine(publishPath, "dependencies"));
                 }
                 foreach(string assemblyDefinitionDependency in AssemblyDefinitionDependencies) {
@@ -107,8 +154,8 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         }
 
         public string GetDLLObjPath(string dllPath) {
-            string debugDllPath = $"obj/Debug/{Path.GetFileName(dllPath)}";
-            string releaseDllPath = $"obj/Release/{Path.GetFileName(dllPath)}";
+            string debugDllPath = Path.Combine("obj", "Debug", Path.GetFileName(dllPath));
+            string releaseDllPath = Path.Combine("obj", "Release", Path.GetFileName(dllPath));
 
             bool debugExists = File.Exists(debugDllPath);
             bool releaseExists = File.Exists(releaseDllPath);

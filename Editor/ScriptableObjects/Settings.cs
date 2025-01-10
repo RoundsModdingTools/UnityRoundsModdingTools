@@ -14,6 +14,7 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         [Header("Settings for Publishing Mod")]
         public string PublishPath = "Publish";
         public string PublishFolderCopyTo = "";
+        public bool AutoPublish = false;
 
         [Header("Settings for Creating Mod")]
         public string TemplatePath = "https://github.com/RoundsModdingTools/UnityRoundsModTemplate";
