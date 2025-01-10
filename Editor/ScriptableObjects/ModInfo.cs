@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -36,6 +37,9 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
         }
 
         public void PublishMod() {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             string modDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(this));
             string publishPath = Path.Combine(Settings.Instance.PublishPath, ModName);
 
@@ -97,6 +101,9 @@ namespace UnityRoundsModdingTools.Editor.ScriptableObjects {
                 // Copy the folder to the specified path
                 FileSystemManager.CopyDirectory(publishPath, copyToPath, new string[] { }, new string[] { });
             }
+
+            stopwatch.Stop();
+            UnityEngine.Debug.Log($"Published mod {ModName} in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         public string GetDLLObjPath(string dllPath) {
