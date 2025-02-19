@@ -13,7 +13,7 @@ namespace ThunderstoreAPI {
 
         private TimeSpan cacheDuration;
 
-        public ThunderstoreApiClient(TimeSpan cacheDuration) : base() {
+        public ThunderstoreApiClient(TimeSpan cacheDuration) {
             this.cacheDuration = cacheDuration;
         }
 
@@ -49,6 +49,20 @@ namespace ThunderstoreAPI {
                 Category[] categories = JsonConvert.DeserializeObject<Category[]>(content);
                 cachedCategories["categories"] = categories;
                 return categories;
+            }
+        }
+
+        public void InitUpload(string filename, int fizeSizeBytes, string token) {
+            using(var client = new HttpClient()) {
+                var url = $"{THUNDERSTORE_API_URL}/api/v1/package/upload/init/";
+                var content = new StringContent(JsonConvert.SerializeObject(new {
+                    filename,
+                    fizeSizeBytes,
+                }), System.Text.Encoding.UTF8, "application/json");
+                var response = client.PostAsync(url, content).Result;
+                // Set the bearer token
+                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                response.EnsureSuccessStatusCode();
             }
         }
     }
