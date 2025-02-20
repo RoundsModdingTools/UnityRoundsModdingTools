@@ -8,10 +8,10 @@ namespace ThunderstoreAPI.Entities {
         public string AuthorName;
 
         [JsonProperty("categories")]
-        public List<string> Categories;
+        public string[] Categories;
 
         [JsonProperty("communities")]
-        public List<string> Communities;
+        public string[] Communities;
 
         [JsonProperty("has_nsfw_content")]
         public bool HasNSFWContent;
@@ -22,10 +22,10 @@ namespace ThunderstoreAPI.Entities {
         [JsonProperty("community_categories")]
         public Dictionary<string, List<string>> CommunityCategories;
 
-        public PackageSubmissionMetadata(string authorName, List<string> categories, List<string> communities, bool hasNSFWContent, Guid uploadUUID, Dictionary<string, List<string>> communityCategories) {
+        public PackageSubmissionMetadata(string authorName, string[] categories, string[] communities, bool hasNSFWContent, Guid uploadUUID, Dictionary<string, List<string>> communityCategories) {
             AuthorName = authorName;
-            Categories = categories ?? new List<string>();
-            Communities = communities ?? new List<string>();
+            Categories = categories ?? new string[0];
+            Communities = communities ?? new string[0];
             HasNSFWContent = hasNSFWContent;
             UploadUUID = uploadUUID;
             CommunityCategories = communityCategories ?? new Dictionary<string, List<string>>();

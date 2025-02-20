@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace Assets.Plugins.UnityRoundsModdingTools.Editor.Wrappers.ThunderstoreAPI {
+namespace ThunderstoreAPI {
     public class RequestBuilder {
         private UriBuilder uriBuilder = new UriBuilder() {
             Scheme = "https"

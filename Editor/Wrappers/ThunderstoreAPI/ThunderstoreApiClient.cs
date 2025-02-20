@@ -1,8 +1,10 @@
-﻿using Assets.Plugins.UnityRoundsModdingTools.Editor.Wrappers.ThunderstoreAPI;
+﻿using ThunderstoreAPI;
 using Newtonsoft.Json;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -123,10 +125,10 @@ namespace ThunderstoreAPI {
             throw new InvalidOperationException("ETag not found in the response.");
         }
 
-        public async Task FinishUploadAsync(List<CompletedPart> completedParts, Guid guid, string token) {
+        public async Task FinishUploadAsync(List<CompletedPart> completedParts, Guid uuid, string token) {
             var request = requestBuilder
                 .StartNew()
-                .WithEndpoint($"{THUNDERSTORE_API_URL}/api​/experimental​/usermedia​/{guid}​/finish-upload​")
+                .WithEndpoint($"{THUNDERSTORE_API_URL}/api​/experimental​/usermedia​/{uuid}​/finish-upload​")
                 .WithAuth(new AuthenticationHeaderValue("Bearer", token))
                 .WithMethod(HttpMethod.Post)
                 .WithContent(new StringContent(JsonConvert.SerializeObject(new {
@@ -153,6 +155,57 @@ namespace ThunderstoreAPI {
             var response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task SubmitPackageAsync(Guid uuid, string autherName, string[] communities, string[] categories, bool hasNSFWContent, Dictionary<string, List<string>> communityCategories) {
+            var metadata = new PackageSubmissionMetadata {
+                AuthorName = autherName,
+                Categories = categories,
+                Communities = communities,
+                HasNSFWContent = hasNSFWContent,
+                UploadUUID = uuid,
+                CommunityCategories = communityCategories,
+            };
+
+            var request = requestBuilder
+                .StartNew()
+                .WithEndpoint("/api/experimental/submission/submit")
+                .WithMethod(HttpMethod.Post)
+                .WithContent(new StringContent(JsonConvert.SerializeObject(metadata), Encoding.UTF8, "application/json"))
+                .Build();
+
+            var response = await client.SendAsync(request);
+
+            if (response.StatusCode == HttpStatusCode.BadRequest) {
+                var errorMessage = await HandleBadRequestAsync(response);
+                if(!errorMessage.IsNullOrWhitespace()) {
+                    throw new Exception(errorMessage);
+                }
+            }
+
+            if(response.IsSuccessStatusCode) {
+                return; 
+            }
+
+            throw new InvalidOperationException("Unexpected exception while submitting package.");
+        }
+
+        private async Task<string?> HandleBadRequestAsync(HttpResponseMessage responseMessage) {
+            var responseBody = await responseMessage.Content.ReadAsStringAsync();
+            var errorObj = JsonConvert.DeserializeObject<ErrorResponse?>(responseBody);
+
+            if(errorObj?.File == null || !errorObj.Value.File.Any()) {
+                return null;
+            }
+
+            // For each error, split on ':' to extract the message (if possible)
+            var messages = errorObj.Value.File.Select(err => {
+                var parts = err.Split(new[] { ':' }, 2);
+                return parts.Length == 2 ? parts[1].Trim() : err;
+            });
+
+            return string.Join(", ", messages);
+        }
+
 
         public void Dispose() {
             client.Dispose();
