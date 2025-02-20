@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using ThunderstoreAPI.Entities;
+using ThunderstoreAPI.Entities.UserMedia;
 
 namespace ThunderstoreAPI {
     public partial class ThunderstoreApiClient {
@@ -32,6 +34,7 @@ namespace ThunderstoreAPI {
                 Package[] packages = JsonConvert.DeserializeObject<Package[]>(content);
                 cachedPackages[community] = (packages, DateTimeOffset.Now);
 
+                response.EnsureSuccessStatusCode();
                 return packages;
             }
         }
@@ -48,11 +51,13 @@ namespace ThunderstoreAPI {
 
                 Category[] categories = JsonConvert.DeserializeObject<Category[]>(content);
                 cachedCategories["categories"] = categories;
+
+                response.EnsureSuccessStatusCode();
                 return categories;
             }
         }
 
-        public void InitUpload(string filename, int fizeSizeBytes, string token) {
+        public UserMediaInitiateUploadResponse InitiateUpload(string filename, int fizeSizeBytes, string token) {
             using(var client = new HttpClient()) {
                 var url = $"{THUNDERSTORE_API_URL}/api/v1/package/upload/init/";
                 var content = new StringContent(JsonConvert.SerializeObject(new {
@@ -61,8 +66,11 @@ namespace ThunderstoreAPI {
                 }), System.Text.Encoding.UTF8, "application/json");
                 var response = client.PostAsync(url, content).Result;
                 // Set the bearer token
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 response.EnsureSuccessStatusCode();
+
+                UserMediaInitiateUploadResponse uploadResponse = JsonConvert.DeserializeObject<UserMediaInitiateUploadResponse>(response.Content.ReadAsStringAsync().Result);
+                return uploadResponse;
             }
         }
     }
