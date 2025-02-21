@@ -18,7 +18,7 @@ namespace ThunderstoreAPI {
         }
 
         public RequestBuilder StartNew() {
-            return new(uriBuilder.Uri.Host);
+            return new RequestBuilder(uriBuilder.Uri.Host);
         }
 
         public RequestBuilder WithEndpoint(string endpoint) {

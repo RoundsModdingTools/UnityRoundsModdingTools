@@ -20,15 +20,15 @@ namespace ThunderstoreAPI.Entities {
         public Guid UploadUUID;
 
         [JsonProperty("community_categories")]
-        public Dictionary<string, List<string>> CommunityCategories;
+        public Dictionary<string, string[]> CommunityCategories;
 
-        public PackageSubmissionMetadata(string authorName, string[] categories, string[] communities, bool hasNSFWContent, Guid uploadUUID, Dictionary<string, List<string>> communityCategories) {
+        public PackageSubmissionMetadata(string authorName, string[] categories, string[] communities, bool hasNSFWContent, Guid uploadUUID, Dictionary<string, string[]> communityCategories) {
             AuthorName = authorName;
             Categories = categories ?? new string[0];
             Communities = communities ?? new string[0];
             HasNSFWContent = hasNSFWContent;
             UploadUUID = uploadUUID;
-            CommunityCategories = communityCategories ?? new Dictionary<string, List<string>>();
+            CommunityCategories = communityCategories ?? new Dictionary<string, string[]>();
         }
     }
 }

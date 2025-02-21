@@ -4,7 +4,7 @@ using ThunderstoreAPI.Entities.UserMedia;
 
 namespace ThunderstoreAPI.Entities.UserMedia {
     public struct UserMedia {
-        [JsonProperty("uuid")] public string UUID;
+        [JsonProperty("uuid")] public Guid UUID;
         [JsonProperty("filename")] public string Filename;
         [JsonProperty("size")] public long Size;
         [JsonProperty("datetime_created")] public DateTime DateTimeCreated;

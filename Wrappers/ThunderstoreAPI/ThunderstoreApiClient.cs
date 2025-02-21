@@ -1,5 +1,4 @@
-﻿using ThunderstoreAPI;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
@@ -16,16 +15,17 @@ namespace ThunderstoreAPI {
     public partial class ThunderstoreApiClient : IDisposable {
         private const string THUNDERSTORE_API_URL = "https://thunderstore.io";
 
-        Dictionary<string, (Package[], DateTimeOffset)> cachedPackages = new Dictionary<string, (Package[], DateTimeOffset)>();
-        Dictionary<string, Category[]> cachedCategories = new Dictionary<string, Category[]>();
+        private readonly Dictionary<string, (Package[], DateTimeOffset)> cachedPackages = new Dictionary<string, (Package[], DateTimeOffset)>();
+        private readonly Dictionary<string, Category[]> cachedCategories = new Dictionary<string, Category[]>();
 
-        private RequestBuilder requestBuilder;
-        private HttpClient client;
-        private TimeSpan cacheDuration;
+        private readonly RequestBuilder requestBuilder;
+        private readonly HttpClient client;
+        private readonly TimeSpan cacheDuration;
 
         public ThunderstoreApiClient(TimeSpan cacheDuration) {
             this.cacheDuration = cacheDuration;
             this.client = new HttpClient();
+            this.client.DefaultRequestHeaders.Add("User-Agent", "UnityRoundsModdingTools");
 
             requestBuilder = new RequestBuilder(THUNDERSTORE_API_URL);
         }
@@ -43,7 +43,7 @@ namespace ThunderstoreAPI {
                 .WithMethod(HttpMethod.Get)
                 .Build();
 
-            using var response = await client.SendAsync(request);
+            var response = await client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
 
             Package[] packages = JsonConvert.DeserializeObject<Package[]>(content);
@@ -64,14 +64,47 @@ namespace ThunderstoreAPI {
                 .WithMethod(HttpMethod.Get)
                 .Build();
 
-            using var response = await client.SendAsync(request);
-            var content = await response.Content.ReadAsStringAsync();
+            using(var response = await client.SendAsync(request)) {
+                var content = await response.Content.ReadAsStringAsync();
 
-            Category[] categories = JsonConvert.DeserializeObject<Category[]>(content);
-            cachedCategories["categories"] = categories;
+                Category[] categories = JsonConvert.DeserializeObject<Category[]>(content);
+                cachedCategories["categories"] = categories;
 
-            response.EnsureSuccessStatusCode();
-            return categories;
+                response.EnsureSuccessStatusCode();
+
+                return categories;
+            }
+        }
+
+        public async Task PublishAsync(PublishOption publishOption, Byte[] data, string token) {
+            if(publishOption.AuthorName.IsNullOrWhitespace()) {
+                throw new ArgumentNullException("Author name must not be null or empty.", nameof(publishOption.AuthorName));
+            } else if(publishOption.Communities == null || publishOption.Communities.Length == 0) {
+                throw new ArgumentNullException("Communities must not be null or empty.", nameof(publishOption.Communities));
+            }
+
+            var uploadResponse = await InitiateUploadAsync(publishOption.AuthorName, data.Length, token);
+
+            Guid uuid = uploadResponse.UserMedia.UUID;
+
+            // Upload the data in parallel
+            var tasks = new List<Task>();
+            foreach(var part in uploadResponse.UploadUrls) {
+                tasks.Add(Task.Run(() => UploadChuckAsync(part, data)));
+            }
+
+
+            List<CompletedPart> parts;
+            try {
+                await Task.WhenAll(tasks);
+                parts = tasks.Select(t => ((Task<CompletedPart>)t).Result).ToList();
+            } catch(Exception ex) {
+                _ = Task.Run(() => AbortUploadAsync(uuid, token));
+                throw new Exception("Failed to upload file", ex);
+            }
+
+            await FinishUploadAsync(parts, uuid, token);
+            await SubmitPackageAsync(uuid, publishOption);
         }
 
         public async Task<UserMediaInitiateUploadResponse> InitiateUploadAsync(string filename, int fileSizeBytes, string token) {
@@ -86,12 +119,13 @@ namespace ThunderstoreAPI {
                 }), Encoding.UTF8, "application/json"))
                 .Build();
 
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            using(var response = await client.SendAsync(request)) {
+                response.EnsureSuccessStatusCode();
 
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var uploadResponse = JsonConvert.DeserializeObject<UserMediaInitiateUploadResponse>(responseContent);
-            return uploadResponse;
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var uploadResponse = JsonConvert.DeserializeObject<UserMediaInitiateUploadResponse>(responseContent);
+                return uploadResponse;
+            }
         }
 
 
@@ -110,15 +144,15 @@ namespace ThunderstoreAPI {
                 .WithContentType("application/octet-stream")
                 .Build();
 
-            using var response = await client.SendAsync(request);
-
-            if(response.Headers.TryGetValues("ETag", out var values)) {
-                var eTag = values.FirstOrDefault();
-                if(eTag != null) {
-                    return new CompletedPart {
-                        ETag = eTag,
-                        PartNumber = part.PartNumber,
-                    };
+            using(var response = await client.SendAsync(request)) {
+                if(response.Headers.TryGetValues("ETag", out var values)) {
+                    var eTag = values.FirstOrDefault();
+                    if(eTag != null) {
+                        return new CompletedPart {
+                            ETag = eTag,
+                            PartNumber = part.PartNumber,
+                        };
+                    }
                 }
             }
 
@@ -136,8 +170,9 @@ namespace ThunderstoreAPI {
                 }), Encoding.UTF8, "application/json"))
                 .Build();
 
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            using(var response = await client.SendAsync(request)) {
+                response.EnsureSuccessStatusCode();
+            }
         }
 
         public async Task AbortUploadAsync(Guid uuid, string token) {
@@ -152,18 +187,19 @@ namespace ThunderstoreAPI {
                 )
                 .Build();
 
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+            using(var response = await client.SendAsync(request)) {
+                response.EnsureSuccessStatusCode();
+            }
         }
 
-        public async Task SubmitPackageAsync(Guid uuid, string autherName, string[] communities, string[] categories, bool hasNSFWContent, Dictionary<string, List<string>> communityCategories) {
+        public async Task SubmitPackageAsync(Guid uuid, PublishOption publishOption) {
             var metadata = new PackageSubmissionMetadata {
-                AuthorName = autherName,
-                Categories = categories,
-                Communities = communities,
-                HasNSFWContent = hasNSFWContent,
+                AuthorName = publishOption.AuthorName,
+                Categories = publishOption.Categories,
+                Communities = publishOption.Communities,
+                HasNSFWContent = publishOption.HasNSFWContent,
+                CommunityCategories = publishOption.CommunityCategories,
                 UploadUUID = uuid,
-                CommunityCategories = communityCategories,
             };
 
             var request = requestBuilder
@@ -173,23 +209,23 @@ namespace ThunderstoreAPI {
                 .WithContent(new StringContent(JsonConvert.SerializeObject(metadata), Encoding.UTF8, "application/json"))
                 .Build();
 
-            var response = await client.SendAsync(request);
-
-            if (response.StatusCode == HttpStatusCode.BadRequest) {
-                var errorMessage = await HandleBadRequestAsync(response);
-                if(!errorMessage.IsNullOrWhitespace()) {
-                    throw new Exception(errorMessage);
+            using(var response = await client.SendAsync(request)) {
+                if(response.StatusCode == HttpStatusCode.BadRequest) {
+                    var errorMessage = await HandleBadRequestAsync(response);
+                    if(!errorMessage.IsNullOrWhitespace()) {
+                        throw new Exception(errorMessage);
+                    }
                 }
-            }
 
-            if(response.IsSuccessStatusCode) {
-                return; 
+                if(response.IsSuccessStatusCode) {
+                    return;
+                }
             }
 
             throw new InvalidOperationException("Unexpected exception while submitting package.");
         }
 
-        private async Task<string?> HandleBadRequestAsync(HttpResponseMessage responseMessage) {
+        private async Task<string> HandleBadRequestAsync(HttpResponseMessage responseMessage) {
             var responseBody = await responseMessage.Content.ReadAsStringAsync();
             var errorObj = JsonConvert.DeserializeObject<ErrorResponse?>(responseBody);
 
