@@ -107,7 +107,7 @@ namespace ThunderstoreAPI {
             await SubmitPackageAsync(uuid, publishOption);
         }
 
-        public async Task<UserMediaInitiateUploadResponse> InitiateUploadAsync(string filename, int fileSizeBytes, string token) {
+        private async Task<UserMediaInitiateUploadResponse> InitiateUploadAsync(string filename, int fileSizeBytes, string token) {
             var request = requestBuilder
                 .StartNew()
                 .WithEndpoint("/api/experimental/usermedia/initiate-upload/")
@@ -159,7 +159,7 @@ namespace ThunderstoreAPI {
             throw new InvalidOperationException("ETag not found in the response.");
         }
 
-        public async Task FinishUploadAsync(List<CompletedPart> completedParts, Guid uuid, string token) {
+        private async Task FinishUploadAsync(List<CompletedPart> completedParts, Guid uuid, string token) {
             var request = requestBuilder
                 .StartNew()
                 .WithEndpoint($"{THUNDERSTORE_API_URL}/api​/experimental​/usermedia​/{uuid}​/finish-upload​")
@@ -175,7 +175,7 @@ namespace ThunderstoreAPI {
             }
         }
 
-        public async Task AbortUploadAsync(Guid uuid, string token) {
+        private async Task AbortUploadAsync(Guid uuid, string token) {
             var request = requestBuilder
                 .StartNew()
                 .WithEndpoint($"{THUNDERSTORE_API_URL}/api​/experimental​/usermedia​/{uuid}​/abort-upload​")
@@ -192,7 +192,7 @@ namespace ThunderstoreAPI {
             }
         }
 
-        public async Task SubmitPackageAsync(Guid uuid, PublishOption publishOption) {
+        private async Task SubmitPackageAsync(Guid uuid, PublishOption publishOption) {
             var metadata = new PackageSubmissionMetadata {
                 AuthorName = publishOption.AuthorName,
                 Categories = publishOption.Categories,
