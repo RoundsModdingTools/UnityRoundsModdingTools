@@ -94,6 +94,25 @@ namespace GitHubAPI {
             }
         }
 
+        public async Task<GithubContent> GetContentFromPathAsync(string owner, string repo, string path) {
+            var request = new RequestBuilder(API_URL)
+                .WithEndpoint($"/repos/{owner}/{repo}/contents/{path}")
+                .WithMethod(HttpMethod.Get)
+                .Build();
+
+            using(var response = await httpClient.SendAsync(request)) {
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+
+                // Check if response is an array (meaning it's a directory)
+                if(content.StartsWith("[")) {
+                    throw new InvalidOperationException("Response is not a directory");
+                }
+
+                return JsonConvert.DeserializeObject<GithubContent>(content);
+            }
+        }
+
         public void Dispose() {
             httpClient.Dispose();
             webClient.Dispose();
