@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
+
+namespace URMT.Core.Settings {
+    public static class SettingsManager {
+        private static readonly Dictionary<ISettingMenu, bool> SettingMenus = new Dictionary<ISettingMenu, bool>();
+
+        public static void RegisterSettingMenu(ISettingMenu settingMenu) {
+            if(settingMenu == null)
+                throw new ArgumentNullException(nameof(settingMenu));
+            if(!(settingMenu is ScriptableObject))
+                throw new ArgumentException("Setting menu must be a ScriptableObject", nameof(settingMenu));
+            if(SettingMenus.ContainsKey(settingMenu))
+                throw new ArgumentException("Setting menu already registered", nameof(settingMenu));
+
+            SettingMenus.Add(settingMenu, false);
+        }
+
+        public static void RenderSettings() {
+            foreach(var key in SettingMenus.Keys) {
+                var scriptableSetting = (ScriptableObject)key;
+
+                SettingMenus[key] = EditorGUILayout.Foldout(SettingMenus[key], key.GetType().Name, true, EditorStyles.foldout);
+                if(!SettingMenus[key]) continue;
+
+                EditorGUI.indentLevel++;
+                SerializedObject serializedObject = new SerializedObject(scriptableSetting);
+                serializedObject.Update();
+
+                bool hasChanges = false;
+                Type settingType = key.GetType();
+                Dictionary<string, MethodInfo> renderMethods = GetRenderMethods(settingType);
+
+                EditorGUI.BeginChangeCheck();
+                SerializedProperty property = serializedObject.GetIterator();
+                property.NextVisible(true);
+
+                while(property.NextVisible(false)) {
+                    if(renderMethods.TryGetValue(property.name, out MethodInfo method)) {
+                        method.Invoke(key, new object[] { property });
+                    } else {
+                        EditorGUILayout.PropertyField(property, true);
+                    }
+                }
+
+                if(EditorGUI.EndChangeCheck()) {
+                    hasChanges = true;
+                }
+
+                if(hasChanges) {
+                    serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(scriptableSetting);
+                    AssetDatabase.SaveAssets();
+                }
+
+                EditorGUI.indentLevel--;
+                EditorGUILayout.Space();
+            }
+        }
+
+        private static Dictionary<string, MethodInfo> GetRenderMethods(Type type) {
+            Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>();
+
+            foreach(MethodInfo method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
+                var attribute = method.GetCustomAttribute<RenderMethodAttribute>();
+                if(attribute != null) {
+                    methods[attribute.FieldName] = method;
+                }
+            }
+            return methods;
+        }
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using System;
 using ThunderstoreAPI.Entities;
+using UnityEngine;
 
 namespace ThunderstoreAPI {
     public partial class ThunderstoreApiClient {
@@ -17,7 +18,7 @@ namespace ThunderstoreAPI {
             if(cachedCategories.TryGetValue("categories", out Category[] cachedCategoriesEntry)) {
                 return cachedCategoriesEntry;
             }
-
+            
             return GetCategoriesAsync().Result;
         }
 

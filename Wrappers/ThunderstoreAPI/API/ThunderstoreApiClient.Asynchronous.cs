@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,7 +76,7 @@ namespace ThunderstoreAPI {
         }
 
         public async Task PublishAsync(PublishOption publishOption, Byte[] data, string token) {
-            if(publishOption.AuthorName.IsNullOrWhitespace()) {
+            if(string.IsNullOrWhiteSpace(publishOption.AuthorName)) {
                 throw new ArgumentNullException("Author name must not be null or empty.", nameof(publishOption.AuthorName));
             } else if(publishOption.Communities == null || publishOption.Communities.Length == 0) {
                 throw new ArgumentNullException("Communities must not be null or empty.", nameof(publishOption.Communities));
@@ -212,7 +211,7 @@ namespace ThunderstoreAPI {
             using(var response = await client.SendAsync(request)) {
                 if(response.StatusCode == HttpStatusCode.BadRequest) {
                     var errorMessage = await HandleBadRequestAsync(response);
-                    if(!errorMessage.IsNullOrWhitespace()) {
+                    if(!string.IsNullOrWhiteSpace(errorMessage)) {
                         throw new Exception(errorMessage);
                     }
                 }
