@@ -1,6 +1,5 @@
 ﻿using GitHubAPI.Entities;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
 using System.Net;
@@ -8,7 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace GitHubAPI {
-    public class GitHubClient : IDisposable {
+    public partial class GitHubClient : IDisposable {
         private const string API_URL = "https://api.github.com";
 
         private readonly WebClient webClient;
@@ -34,7 +33,7 @@ namespace GitHubAPI {
             await webClient.DownloadFileTaskAsync(release.ZipballUrl, savePath);
         }
 
-        public async Task DownloadReleaseAssetAsync(string savePath, string owner, string repo, string tag, string assetName) {
+        public async Task DownloadReleaseAssetAsync(string savePath, string owner, string repo, string assetName, string tag = "latest") {
             var release = await GetReleaseByTagAsync(owner, repo, tag);
             var asset = release.Assets
                 .Where(a => a.Name == assetName)
@@ -43,7 +42,7 @@ namespace GitHubAPI {
             await webClient.DownloadFileTaskAsync(asset.BrowserDownloadUrl, savePath);
         }
 
-        public async Task DownloadReleaseAssetWithFileExtensionAsync(string savePath, string owner, string repo, string tag, string fileExtension) {
+        public async Task DownloadReleaseAssetWithFileExtensionAsync(string savePath, string owner, string repo, string fileExtension, string tag = "latest") {
             var release = await GetReleaseByTagAsync(owner, repo, tag);
             var asset = release.Assets
                 .Where(a => a.FileExtension == fileExtension)
@@ -90,7 +89,7 @@ namespace GitHubAPI {
                 response.EnsureSuccessStatusCode();
 
                 var content = await response.Content.ReadAsStringAsync();
-                return JArray.Parse(content).ToObject<GitHubRelease[]>();
+                return JsonConvert.DeserializeObject<GitHubRelease[]>(content);
             }
         }
 
