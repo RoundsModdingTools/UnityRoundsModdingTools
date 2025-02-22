@@ -2,7 +2,7 @@
 
 namespace ThunderstoreAPI.Entities {
     public struct Category {
-        [JsonProperty("name")] public string Name;
-        [JsonProperty("slug")] public string Slug;
+        [JsonProperty("name")] public string Name { get; set; }
+        [JsonProperty("slug")] public string Slug { get; set; }
     }
 }
