@@ -58,7 +58,6 @@ namespace URMT.Core.Managers {
                 if(hasChanges) {
                     serializedObject.ApplyModifiedProperties();
                     EditorUtility.SetDirty(scriptableSetting);
-                    AssetDatabase.SaveAssets();
                 }
 
                 EditorGUI.indentLevel--;
