@@ -2,7 +2,7 @@
 using UnityEngine;
 using URMT.Core.Managers;
 
-namespace URMT.Core.Windows {
+namespace URMT.Core.UI.Windows {
     public class SettingsWindow : EditorWindow {
         private static Vector2 scrollPosition;
 

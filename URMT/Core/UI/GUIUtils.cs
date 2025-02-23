@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace URMT.Core.UI {
@@ -29,7 +31,7 @@ namespace URMT.Core.UI {
                     GUILayout.Label($" {options[i]} ", tagStyle);
                 }
             }
-            GUILayout.FlexibleSpace(); // Ensures dropdown button stays on the right
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             // Dropdown button on the right when items are selected
@@ -40,6 +42,27 @@ namespace URMT.Core.UI {
 
             GUILayout.EndHorizontal();
             GUILayout.EndHorizontal();
+        }
+
+        public static void DrawAssemblyDefinitionProperty(SerializedProperty property, Rect rect, float width) {
+            string currentAssemblyName = property.stringValue;
+
+            // Find the current assembly definition
+            AssemblyDefinition currentAssemblyDefinition = AssemblyDefinition.All.FirstOrDefault(x => x.Name == currentAssemblyName);
+            AssemblyDefinitionAsset currentAssemblyAsset = currentAssemblyDefinition != null ? AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(currentAssemblyDefinition.AssemblyPath) : null;
+
+            // Create ObjectField for selecting AssemblyDefinitionAsset
+            AssemblyDefinitionAsset newAssemblyAsset = (AssemblyDefinitionAsset)EditorGUI.ObjectField(
+                new Rect(rect.x, rect.y, width, EditorGUIUtility.singleLineHeight),
+                currentAssemblyAsset,
+                typeof(AssemblyDefinitionAsset),
+                false
+            );
+
+            // Update AssemblyName if a new assembly is selected
+            if(newAssemblyAsset != null && newAssemblyAsset != currentAssemblyAsset) {
+                property.stringValue = AssemblyDefinition.LoadFromAssemblyDefinitionAsset(newAssemblyAsset).Name;
+            }
         }
     }
 }
