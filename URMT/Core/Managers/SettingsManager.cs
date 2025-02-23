@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using URMT.Core.Settings;
 
-namespace URMT.Core.Settings {
+namespace URMT.Core.Managers {
     public static class SettingsManager {
         private static readonly Dictionary<ISettingMenu, bool> SettingMenus = new Dictionary<ISettingMenu, bool>();
 
@@ -20,10 +21,14 @@ namespace URMT.Core.Settings {
         }
 
         public static void RenderSettings() {
-            foreach(var key in SettingMenus.Keys) {
-                var scriptableSetting = (ScriptableObject)key;
+            var keys = new List<ISettingMenu>(SettingMenus.Keys);
 
+            foreach(var key in keys) {
+                if(!SettingMenus.ContainsKey(key)) continue;
+
+                var scriptableSetting = (ScriptableObject)key;
                 SettingMenus[key] = EditorGUILayout.Foldout(SettingMenus[key], key.GetType().Name, true, EditorStyles.foldout);
+
                 if(!SettingMenus[key]) continue;
 
                 EditorGUI.indentLevel++;
