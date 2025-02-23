@@ -17,7 +17,7 @@ namespace URMT.Core.Managers {
             if(SettingMenus.ContainsKey(settingMenu))
                 throw new ArgumentException("Setting menu already registered", nameof(settingMenu));
 
-            SettingMenus.Add(settingMenu, false);
+            SettingMenus.Add(settingMenu, true);
         }
 
         public static void RenderSettings() {
@@ -70,7 +70,7 @@ namespace URMT.Core.Managers {
 
             foreach(MethodInfo method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
                 var attribute = method.GetCustomAttribute<RenderMethodAttribute>();
-                if(attribute != null) {
+                if(attribute != null && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == typeof(SerializedProperty)) {
                     methods[attribute.FieldName] = method;
                 }
             }
