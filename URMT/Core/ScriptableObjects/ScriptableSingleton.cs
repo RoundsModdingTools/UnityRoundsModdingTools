@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
+using URMT.Core.Attributes;
 
 namespace URMT.Core.ScriptableObjects {
     public abstract class ScriptableSingleton<T> : ScriptableObject where T : ScriptableObject {
@@ -29,11 +31,19 @@ namespace URMT.Core.ScriptableObjects {
             }
         }
 
+
         private static void CreateAndLoad() {
             instance = ScriptableObject.CreateInstance<T>();
 
-            // Save the newly created instance as an asset
-            string path = $"Assets/Resources/UnityRoundsModdingTools/{typeof(T).Name}.asset";
+            string path;
+            var attribute = (ScriptableSingletonPathAttribute)Attribute.GetCustomAttribute(typeof(T), typeof(ScriptableSingletonPathAttribute));
+
+            if(attribute != null) {
+                path = $"{attribute.Path}/{typeof(T).Name}.asset";
+            } else {
+                path = $"Assets/Resources/UnityRoundsModdingTools/{typeof(T).Name}.asset";
+            }
+
             if(!Directory.Exists(Path.GetDirectoryName(path))) Directory.CreateDirectory(Path.GetDirectoryName(path));
 
             AssetDatabase.CreateAsset(instance, path);
