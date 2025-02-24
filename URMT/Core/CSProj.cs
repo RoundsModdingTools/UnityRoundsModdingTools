@@ -17,7 +17,7 @@ namespace URMT.Core {
                 } else if(!string.IsNullOrEmpty(AssemblyName)) {
                     return AssemblyName;
                 } else if(!string.IsNullOrEmpty(Path)) {
-                    return Path;
+                    return System.IO.Path.GetFileNameWithoutExtension(Path);
                 } else {
                     return null;
                 }
