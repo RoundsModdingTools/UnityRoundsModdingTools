@@ -27,7 +27,7 @@ namespace URMT.Core.Managers {
                 if(!SettingMenus.ContainsKey(key)) continue;
 
                 var scriptableSetting = (ScriptableObject)key;
-                SettingMenus[key] = EditorGUILayout.Foldout(SettingMenus[key], key.GetType().Name, true, EditorStyles.foldout);
+                SettingMenus[key] = EditorGUILayout.Foldout(SettingMenus[key], key.Name, true, EditorStyles.foldout);
 
                 if(!SettingMenus[key]) continue;
 

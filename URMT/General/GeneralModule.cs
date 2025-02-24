@@ -2,12 +2,14 @@
 using URMT.Core.Managers;
 using URMT.Core.Modules;
 using URMT.Core.Settings;
+using URMT.Core.Utils;
 using URMT.General.Entities;
 
 namespace URMT.General {
     [URMTModule("General", "com.aalund13.urmt.general")]
+    [URMTModuleDependency("com.aalund13.urmt.core")]
     public class GeneralModule : IModuleEntry {
-        public ISettingMenu[] SettingMenus => new ISettingMenu[1] { GeneralModuleSettings.Instance };
+        public ISettingMenu[] SettingMenus => new ISettingMenu[] { GeneralModuleSettings.Instance };
 
         public void OnModuleLoad() {
             // These messages exist so you don't have to reference the `URMT.General` assembly in your own code
@@ -24,6 +26,8 @@ namespace URMT.General {
                     .ToArray();
 
                 GeneralModuleSettings.Instance.ModBundleMappings.AddRange(modBundleMappings);
+
+                LoggerUtils.Log($"Added {modBundleMappings.Length} mod bundle mappings");
             });
 
             MessageBus.RegisterMessage("AddFolderMappings", args => {
@@ -39,7 +43,11 @@ namespace URMT.General {
                     .ToArray();
 
                 GeneralModuleSettings.Instance.FolderMappings.AddRange(folderMappings);
+
+                LoggerUtils.Log($"Added {folderMappings.Length} folder mappings");
             });
+
+            LoggerUtils.Log("General Module Loaded");
         }
     }
 }

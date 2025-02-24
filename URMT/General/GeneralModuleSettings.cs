@@ -10,10 +10,11 @@ using URMT.General.Entities;
 
 namespace URMT.General {
     public class GeneralModuleSettings : SettingsSingleton<GeneralModuleSettings> {
-        public override string Name => "General Module";
+        public override string Name => "General Module Settings";
 
         private static ReorderableList ModBundleMappingsList;
         private static ReorderableList folderMappingsList;
+
 
         public List<ModBundleMapping> ModBundleMappings = new List<ModBundleMapping>();
         public List<FolderMapping> FolderMappings = new List<FolderMapping>() {
@@ -40,6 +41,9 @@ namespace URMT.General {
 
         [RenderFor(nameof(ModBundleMappings))]
         private void RenderModBundleMappings(SerializedProperty serializedProperty) {
+            GUILayout.Space(10);
+            EditorGUILayout.LabelField("Mappings", EditorStyles.boldLabel);
+
             if (File.Exists("Assets/Editor/CsprojPostprocessor.cs")) GUI.enabled = false;
             ModBundleMappingsList.DoLayoutList();
             GUI.enabled = true;
