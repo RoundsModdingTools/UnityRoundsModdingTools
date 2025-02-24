@@ -37,12 +37,12 @@ namespace URMT.General {
             CreateFolderMappingsList(serializedObject.FindProperty("FolderMappings"));
         }
 
-        [RenderMethod(nameof(ModBundleMappings))]
+        [RenderFor(nameof(ModBundleMappings))]
         private void RenderModBundleMappings(SerializedProperty serializedProperty) {
             ModBundleMappingsList.DoLayoutList();
         }
 
-        [RenderMethod(nameof(FolderMappings))]
+        [RenderFor(nameof(FolderMappings))]
         private void RenderFolderMappings(SerializedProperty serializedProperty) {
             folderMappingsList.DoLayoutList();
         }

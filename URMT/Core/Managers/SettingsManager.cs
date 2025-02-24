@@ -69,7 +69,7 @@ namespace URMT.Core.Managers {
             Dictionary<string, MethodInfo> methods = new Dictionary<string, MethodInfo>();
 
             foreach(MethodInfo method in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)) {
-                var attribute = method.GetCustomAttribute<RenderMethodAttribute>();
+                var attribute = method.GetCustomAttribute<RenderForAttribute>();
                 if(attribute != null && method.GetParameters().Length == 1 && method.GetParameters()[0].ParameterType == typeof(SerializedProperty)) {
                     methods[attribute.FieldName] = method;
                 }
