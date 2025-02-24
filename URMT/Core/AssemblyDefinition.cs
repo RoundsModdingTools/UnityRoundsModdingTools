@@ -93,12 +93,12 @@ namespace URMT.Core {
         public AssemblyDefinition(string assemblyName) {
             Name = assemblyName;
         }
-        public AssemblyDefinition(string assemblyName, List<string> Includes) {
+        public AssemblyDefinition(string assemblyName, string[] Includes) {
             Name = assemblyName;
             (References, PrecompiledReferences) = ConvertIncludesToReferences(Includes);
         }
 
-        public static AssemblyDefinition LoadFromInclude(string assemblyName, List<string> Includes) {
+        public static AssemblyDefinition LoadFromInclude(string assemblyName, string[] Includes) {
             (List<string> references, List<string> precompiledReferences) = ConvertIncludesToReferences(Includes);
 
             AssemblyDefinition assemblyDefinitionClass = new AssemblyDefinition(assemblyName);
@@ -131,7 +131,7 @@ namespace URMT.Core {
             File.WriteAllText(AssemblyPath, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
 
-        private static (List<string>, List<string>) ConvertIncludesToReferences(List<string> Includes) {
+        private static (List<string>, List<string>) ConvertIncludesToReferences(string[] Includes) {
             List<string> references = new List<string>();
             List<string> precompiledReferences = new List<string>();
 
