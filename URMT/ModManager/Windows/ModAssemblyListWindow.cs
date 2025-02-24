@@ -7,11 +7,16 @@ using UnityEditorInternal;
 using UnityEngine;
 using URMT.Core;
 using URMT.Core.Managers;
+using URMT.Core.UI;
 
 namespace URMT.ModManager.Windows {
     public class ModAssemblyListWindow : EditorWindow {
         private static Dictionary<string, bool> selectedMods;
-        private static readonly string[] ingoredGetAllAssemblyDefinition = new string[] { "URMT" };
+        private static readonly string[] ingoredGetAllAssemblyDefinition = new string[] {
+            "URMT" ,
+            "ThunderstoreAPI",
+            "GitHubAPI",
+        };
 
         private static ReorderableList modAssemblyList;
         private static Vector2 scrollPosition;
@@ -39,6 +44,8 @@ namespace URMT.ModManager.Windows {
         }
 
         private void OnGUI() {
+            GUIUtils.DrawTitle("Mod Assembly List");
+
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(EditorGUIUtility.currentViewWidth), GUILayout.Height(Screen.height - 30));
 
             modAssemblyList.DoLayoutList();

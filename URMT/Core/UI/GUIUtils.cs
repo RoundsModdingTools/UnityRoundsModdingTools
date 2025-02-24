@@ -64,5 +64,16 @@ namespace URMT.Core.UI {
                 property.stringValue = AssemblyDefinition.LoadFromAssemblyDefinitionAsset(newAssemblyAsset).Name;
             }
         }
+
+        public static void DrawTitle(string text) {
+            GUILayout.Space(10);
+
+            GUIStyle headerLabelStyle = new GUIStyle(EditorStyles.boldLabel) {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 18
+            };
+            GUILayout.Label(text, headerLabelStyle);
+            GUILayout.Space(10);
+        }
     }
 }

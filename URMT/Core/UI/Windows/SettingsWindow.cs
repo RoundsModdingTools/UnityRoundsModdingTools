@@ -11,6 +11,8 @@ namespace URMT.Core.UI.Windows {
             GetWindow<SettingsWindow>("URMT Settings");
         }
         private void OnGUI() {
+            GUIUtils.DrawTitle("URMT Settings");
+
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(EditorGUIUtility.currentViewWidth), GUILayout.Height(Screen.height - 30));
 
             SettingsManager.RenderSettings();
