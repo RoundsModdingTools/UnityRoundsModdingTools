@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -45,6 +46,7 @@ namespace URMT.General {
             EditorGUILayout.LabelField("Mappings", EditorStyles.boldLabel);
 
             if (File.Exists("Assets/Editor/CsprojPostprocessor.cs")) GUI.enabled = false;
+            
             modBundleMappingsList.DoLayoutList();
             GUI.enabled = true;
         }
@@ -52,8 +54,20 @@ namespace URMT.General {
         [RenderFor(nameof(FolderMappings))]
         private void RenderFolderMappings(SerializedProperty serializedProperty) {
             if(File.Exists("Assets/Editor/CsprojPostprocessor.cs")) GUI.enabled = false;
+            
             folderMappingsList.DoLayoutList();
             GUI.enabled = true;
+
+            if(GUILayout.Button("Recompile")) {
+                var editorAssembly = Assembly.GetAssembly(typeof(UnityEditor.Editor));
+                var editorCompilationInterfaceType = editorAssembly.GetType("UnityEditor.Scripting.ScriptCompilation.EditorCompilationInterface");
+                var dirtyAllScriptsMethod = editorCompilationInterfaceType.GetMethod("DirtyAllScripts", BindingFlags.Static | BindingFlags.Public);
+                dirtyAllScriptsMethod.Invoke(editorCompilationInterfaceType, null);
+
+                var SyncVSType = editorAssembly.GetType("UnityEditor.SyncVS");
+                var SyncSolutionMethod = SyncVSType.GetMethod("SyncIfFirstFileOpenSinceDomainLoad", BindingFlags.Static | BindingFlags.Public);
+                SyncSolutionMethod.Invoke(editorCompilationInterfaceType, null);
+            }
         }
 
         private void CreateProjectMappingsList(SerializedProperty projectMappingsProperty) {
