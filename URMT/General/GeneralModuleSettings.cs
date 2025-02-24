@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -39,12 +40,16 @@ namespace URMT.General {
 
         [RenderFor(nameof(ModBundleMappings))]
         private void RenderModBundleMappings(SerializedProperty serializedProperty) {
+            if (File.Exists("Assets/Editor/CsprojPostprocessor.cs")) GUI.enabled = false;
             ModBundleMappingsList.DoLayoutList();
+            GUI.enabled = true;
         }
 
         [RenderFor(nameof(FolderMappings))]
         private void RenderFolderMappings(SerializedProperty serializedProperty) {
+            if(File.Exists("Assets/Editor/CsprojPostprocessor.cs")) GUI.enabled = false;
             folderMappingsList.DoLayoutList();
+            GUI.enabled = true;
         }
 
         private void CreateProjectMappingsList(SerializedProperty projectMappingsProperty) {
