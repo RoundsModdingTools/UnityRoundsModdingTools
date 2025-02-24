@@ -7,15 +7,15 @@ using URMT.Core.Modules;
 namespace URMT.Core.Managers {
     [InitializeOnLoad]
     public static class ModuleManager {
-        private static List<ModuleInfo> Modules { get; } = new List<ModuleInfo>();
-        public static IReadOnlyList<ModuleInfo> LoadedModules => Modules.AsReadOnly();
+        private static List<ModuleInfo> moduleList { get; } = new List<ModuleInfo>();
+        public static IReadOnlyList<ModuleInfo> LoadedModules => moduleList.AsReadOnly();
 
         static ModuleManager() {
             LoadModules();
         }
 
         public static void LoadModules() {
-            Modules.Clear();
+            moduleList.Clear();
 
             // load all assemblies that reference URMT.Core
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
@@ -36,24 +36,24 @@ namespace URMT.Core.Managers {
                             continue;
                         }
 
-                        Modules.Add(new ModuleInfo(module));
+                        moduleList.Add(new ModuleInfo(module));
                     }
                 }
             }
 
             // Sort the modules list by dependencies
-            for(int i = 0; i < Modules.Count; i++) {
-                for(int j = i + 1; j < Modules.Count; j++) {
-                    if(Modules[i].Dependencies.Contains(Modules[j].ID)) {
-                        var temp = Modules[i];
-                        Modules[i] = Modules[j];
-                        Modules[j] = temp;
+            for(int i = 0; i < moduleList.Count; i++) {
+                for(int j = i + 1; j < moduleList.Count; j++) {
+                    if(moduleList[i].Dependencies.Contains(moduleList[j].ID)) {
+                        var temp = moduleList[i];
+                        moduleList[i] = moduleList[j];
+                        moduleList[j] = temp;
                     }
                 }
             }
 
             // Load the modules
-            foreach(var module in Modules) {
+            foreach(var module in moduleList) {
                 try {
                     module.ModuleEntry.OnModuleLoad();
 
@@ -77,7 +77,7 @@ namespace URMT.Core.Managers {
                 return $"{type.Name} does not have URMTModuleAttribute";
             else {
                 var guid = ((URMTModuleAttribute)attributes.First()).GUID;
-                if(Modules.Any(x => x.ID == guid))
+                if(moduleList.Any(x => x.ID == guid))
                     return $"{type.Name} has a duplicate GUID: {guid}";
             }
             return null;
