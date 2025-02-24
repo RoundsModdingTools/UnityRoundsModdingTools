@@ -47,6 +47,24 @@ namespace URMT.General {
                 LoggerUtils.Log($"Added {folderMappings.Length} folder mappings");
             });
 
+            MessageBus.RegisterMessage("RemoveModBundleMappings", args => {
+                string[] modNames = args.Cast<string>().ToArray();
+
+                GeneralModuleSettings.Instance.ModBundleMappings
+                    .RemoveAll(mapping => modNames.Contains(mapping.ModName));
+
+                LoggerUtils.Log($"Removed {modNames.Length} mod bundle mappings");
+            });
+
+            MessageBus.RegisterMessage("RemoveFolderMappings", args => {
+                string[] assemblyNames = args.Cast<string>().ToArray();
+
+                GeneralModuleSettings.Instance.FolderMappings
+                    .RemoveAll(mapping => assemblyNames.Contains(mapping.AssemblyName));
+                
+                LoggerUtils.Log($"Removed {assemblyNames.Length} folder mappings");
+            });
+
             LoggerUtils.Log("General Module Loaded");
         }
     }

@@ -12,7 +12,7 @@ namespace URMT.General {
     public class GeneralModuleSettings : SettingsSingleton<GeneralModuleSettings> {
         public override string Name => "General Module Settings";
 
-        private static ReorderableList ModBundleMappingsList;
+        private static ReorderableList modBundleMappingsList;
         private static ReorderableList folderMappingsList;
 
 
@@ -45,7 +45,7 @@ namespace URMT.General {
             EditorGUILayout.LabelField("Mappings", EditorStyles.boldLabel);
 
             if (File.Exists("Assets/Editor/CsprojPostprocessor.cs")) GUI.enabled = false;
-            ModBundleMappingsList.DoLayoutList();
+            modBundleMappingsList.DoLayoutList();
             GUI.enabled = true;
         }
 
@@ -57,12 +57,12 @@ namespace URMT.General {
         }
 
         private void CreateProjectMappingsList(SerializedProperty projectMappingsProperty) {
-            ModBundleMappingsList = new ReorderableList(projectMappingsProperty.serializedObject, projectMappingsProperty, true, true, true, true);
-            ModBundleMappingsList.drawHeaderCallback = rect => {
+            modBundleMappingsList = new ReorderableList(projectMappingsProperty.serializedObject, projectMappingsProperty, true, true, true, true);
+            modBundleMappingsList.drawHeaderCallback = rect => {
                 EditorGUI.LabelField(rect, "Mod Bundle Mappings");
             };
-            ModBundleMappingsList.drawElementCallback = (rect, index, isActive, isFocused) => {
-                var element = ModBundleMappingsList.serializedProperty.GetArrayElementAtIndex(index);
+            modBundleMappingsList.drawElementCallback = (rect, index, isActive, isFocused) => {
+                var element = modBundleMappingsList.serializedProperty.GetArrayElementAtIndex(index);
                 rect.y += 2;
                 float halfWidth = rect.width / 2 - 10;
 
@@ -79,7 +79,7 @@ namespace URMT.General {
 
                 projectMappingsProperty.serializedObject.ApplyModifiedProperties();
             };
-            ModBundleMappingsList.onAddCallback = list => {
+            modBundleMappingsList.onAddCallback = list => {
                 var index = list.serializedProperty.arraySize;
                 list.serializedProperty.arraySize++;
                 list.index = index;
@@ -90,7 +90,7 @@ namespace URMT.General {
 
                 projectMappingsProperty.serializedObject.ApplyModifiedProperties();
             };
-            ModBundleMappingsList.onRemoveCallback = list => {
+            modBundleMappingsList.onRemoveCallback = list => {
                 list.serializedProperty.DeleteArrayElementAtIndex(list.index);
                 projectMappingsProperty.serializedObject.ApplyModifiedProperties();
             };
