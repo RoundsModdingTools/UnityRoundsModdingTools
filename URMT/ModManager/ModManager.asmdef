@@ -1,7 +1,8 @@
 {
     "name": "URMT.ModManager",
     "references": [
-        "URMT.Core"
+        "URMT.Core",
+        "GitHubAPI"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

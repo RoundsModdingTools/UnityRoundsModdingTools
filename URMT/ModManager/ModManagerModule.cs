@@ -4,8 +4,9 @@ using URMT.Core.Utils;
 
 namespace URMT.ModManager {
     [URMTModule("ModManager", "com.aalund13.urmt.modmanager")]
+    [URMTModuleDependency("com.aalund13.urmt.core")]
     public class ModManagerModule : IModuleEntry {
-        public ISettingMenu[] SettingMenus => new ISettingMenu[] { ModManagerModuleSettings.Instance };
+        public ISettingMenu[] SettingMenus => new ISettingMenu[0];
 
         public void OnModuleLoad() {
             LoggerUtils.Log("ModManager Module Loaded");
