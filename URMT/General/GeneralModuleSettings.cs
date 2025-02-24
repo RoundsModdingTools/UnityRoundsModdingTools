@@ -1,0 +1,130 @@
+﻿using System.Collections.Generic;
+using UnityEditor;
+using UnityEditorInternal;
+using UnityEngine;
+using URMT.Core.ScriptableObjects;
+using URMT.Core.Settings;
+using URMT.Core.UI;
+using URMT.General.Entities;
+
+namespace URMT.General {
+    public class GeneralModuleSettings : SettingsSingleton<GeneralModuleSettings> {
+        public override string Name => "General Module";
+
+        private static ReorderableList ModBundleMappingsList;
+        private static ReorderableList folderMappingsList;
+
+        public List<ModBundleMapping> ModBundleMappings = new List<ModBundleMapping>();
+        public List<FolderMapping> FolderMappings = new List<FolderMapping>() {
+            new FolderMapping("CardChoiceSpawnUniqueCardPatch", "Libraries"),
+            new FolderMapping("CardThemeLib", "Libraries"),
+            new FolderMapping("ClassesManagerReborn", "Libraries"),
+            new FolderMapping("ItemShops", "Libraries"),
+            new FolderMapping("ModdingUtils", "Libraries"),
+            new FolderMapping("ModsPlus", "Libraries"),
+            new FolderMapping("PickNCards", "Libraries"),
+            new FolderMapping("RarityLib", "Libraries"),
+            new FolderMapping("RoundsWithFriends", "Libraries"),
+            new FolderMapping("UnboundLib", "Libraries"),
+            new FolderMapping("WillsWackyManagers", "Libraries"),
+            new FolderMapping("ILGenerator", "Libraries"),
+        };
+
+        public void OnEnable() {
+            var serializedObject = new SerializedObject(this);
+
+            CreateProjectMappingsList(serializedObject.FindProperty("ModBundleMappings"));
+            CreateFolderMappingsList(serializedObject.FindProperty("FolderMappings"));
+        }
+
+        [RenderMethod(nameof(ModBundleMappings))]
+        private void RenderModBundleMappings(SerializedProperty serializedProperty) {
+            ModBundleMappingsList.DoLayoutList();
+        }
+
+        [RenderMethod(nameof(FolderMappings))]
+        private void RenderFolderMappings(SerializedProperty serializedProperty) {
+            folderMappingsList.DoLayoutList();
+        }
+
+        private void CreateProjectMappingsList(SerializedProperty projectMappingsProperty) {
+            ModBundleMappingsList = new ReorderableList(projectMappingsProperty.serializedObject, projectMappingsProperty, true, true, true, true);
+            ModBundleMappingsList.drawHeaderCallback = rect => {
+                EditorGUI.LabelField(rect, "Mod Bundle Mappings");
+            };
+            ModBundleMappingsList.drawElementCallback = (rect, index, isActive, isFocused) => {
+                var element = ModBundleMappingsList.serializedProperty.GetArrayElementAtIndex(index);
+                rect.y += 2;
+                float halfWidth = rect.width / 2 - 10;
+
+                // Get the current ModName
+                SerializedProperty modNameProperty = element.FindPropertyRelative("ModName");
+                GUIUtils.DrawAssemblyDefinitionProperty(modNameProperty, rect, rect.width / 2 - 10);
+
+                // AssetBundleName field
+                EditorGUI.PropertyField(
+                    new Rect(rect.x + halfWidth + 10, rect.y, halfWidth, EditorGUIUtility.singleLineHeight),
+                    element.FindPropertyRelative("AssetBundleName"),
+                    new GUIContent("Asset Bundle Name")
+                );
+
+                projectMappingsProperty.serializedObject.ApplyModifiedProperties();
+            };
+            ModBundleMappingsList.onAddCallback = list => {
+                var index = list.serializedProperty.arraySize;
+                list.serializedProperty.arraySize++;
+                list.index = index;
+
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                element.FindPropertyRelative("ModName").stringValue = "";
+                element.FindPropertyRelative("AssetBundleName").stringValue = "";
+
+                projectMappingsProperty.serializedObject.ApplyModifiedProperties();
+            };
+            ModBundleMappingsList.onRemoveCallback = list => {
+                list.serializedProperty.DeleteArrayElementAtIndex(list.index);
+                projectMappingsProperty.serializedObject.ApplyModifiedProperties();
+            };
+        }
+
+        private void CreateFolderMappingsList(SerializedProperty folderMappingsProperty) {
+            folderMappingsList = new ReorderableList(folderMappingsProperty.serializedObject, folderMappingsProperty, true, true, true, true);
+            folderMappingsList.drawHeaderCallback = rect => {
+                EditorGUI.LabelField(rect, "Folder Mappings");
+            };
+            folderMappingsList.drawElementCallback = (rect, index, isActive, isFocused) => {
+                var element = folderMappingsList.serializedProperty.GetArrayElementAtIndex(index);
+                rect.y += 2;
+                float halfWidth = rect.width / 2 - 10;
+
+                // Get the current AssemblyName
+                SerializedProperty assemblyNameProperty = element.FindPropertyRelative("AssemblyName");
+                GUIUtils.DrawAssemblyDefinitionProperty(assemblyNameProperty, rect, rect.width / 2 - 10);
+
+                // FolderName field
+                EditorGUI.PropertyField(
+                    new Rect(rect.x + halfWidth + 10, rect.y, halfWidth, EditorGUIUtility.singleLineHeight),
+                    element.FindPropertyRelative("FolderName"),
+                    new GUIContent("Folder Name")
+                );
+
+                folderMappingsProperty.serializedObject.ApplyModifiedProperties();
+            };
+            folderMappingsList.onAddCallback = list => {
+                var index = list.serializedProperty.arraySize;
+                list.serializedProperty.arraySize++;
+                list.index = index;
+
+                var element = list.serializedProperty.GetArrayElementAtIndex(index);
+                element.FindPropertyRelative("AssemblyName").stringValue = "";
+                element.FindPropertyRelative("FolderName").stringValue = "";
+
+                folderMappingsProperty.serializedObject.ApplyModifiedProperties();
+            };
+            folderMappingsList.onRemoveCallback = list => {
+                list.serializedProperty.DeleteArrayElementAtIndex(list.index);
+                folderMappingsProperty.serializedObject.ApplyModifiedProperties();
+            };
+        }
+    }
+}
