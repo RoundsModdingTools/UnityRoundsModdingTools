@@ -5,12 +5,10 @@ namespace URMT.Core.Modules {
     public class URMTModuleAttribute : Attribute {
         public string Name { get; }
         public string GUID { get; set; }
-        public string Version { get; }
 
-        public URMTModuleAttribute(string name, string guid, string version) {
+        public URMTModuleAttribute(string name, string guid) {
             Name = name;
             GUID = guid;
-            Version = version;
         }
     }
 }
