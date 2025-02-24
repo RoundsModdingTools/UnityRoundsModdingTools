@@ -1,21 +1,22 @@
 ﻿using GitHubAPI.Entities;
+using System.Threading.Tasks;
 
 namespace GitHubAPI {
     public partial class GitHubClient {
         public void DownloadGithubZip(string savePath, string owner, string repo, string branch = "") {
-            DownloadGithubZipAsync(savePath, owner, repo, branch).Wait();
+            Task.Run(() => DownloadGithubZipAsync(savePath, owner, repo, branch)).Wait();
         }
 
         public void DownloadReleaseZip(string savePath, string owner, string repo, string tag = "latest") {
-            DownloadReleaseZipAsync(savePath, owner, repo, tag).Wait();
+            Task.Run(() => DownloadReleaseZipAsync(savePath, owner, repo, tag)).Wait();
         }
 
         public void DownloadReleaseAsset(string savePath, string owner, string repo, string assetName, string tag = "latest") {
-            DownloadReleaseAssetAsync(savePath, owner, repo, assetName, tag).Wait();
+            Task.Run(() => DownloadReleaseAssetAsync(savePath, owner, repo, assetName, tag)).Wait();
         }
 
         public void DownloadReleaseAssetWithFileExtension(string savePath, string owner, string repo, string fileExtension, string tag = "latest") {
-            DownloadReleaseAssetWithFileExtensionAsync(savePath, owner, repo, fileExtension, tag).Wait();
+            Task.Run(() => DownloadReleaseAssetWithFileExtensionAsync(savePath, owner, repo, fileExtension, tag)).Wait();
         }
 
         public GitHubRelease GetLatestReleaseTag(string owner, string repo) {

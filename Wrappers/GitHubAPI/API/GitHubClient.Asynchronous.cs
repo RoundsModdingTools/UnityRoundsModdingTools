@@ -21,11 +21,22 @@ namespace GitHubAPI {
             httpClient.DefaultRequestHeaders.Add("User-Agent", "UnityRoundsModdingTools");
         }
 
+        private void EnsurePathExists(string path) {
+            if(System.IO.Directory.Exists(path)) {
+                System.IO.Directory.Delete(path, true);
+            }
+            System.IO.Directory.CreateDirectory(path);
+        }
+
         public async Task DownloadGithubZipAsync(string savePath, string owner, string repo, string branch = "") {
+            EnsurePathExists(System.IO.Path.GetDirectoryName(savePath));
+
             await webClient.DownloadFileTaskAsync($"{API_URL}/repos/{owner}/{repo}/zipball/{branch}", savePath);
         }
 
         public async Task DownloadReleaseZipAsync(string savePath, string owner, string repo, string tag = "latest") {
+            EnsurePathExists(System.IO.Path.GetDirectoryName(savePath));
+
             var release = tag == "latest"
                 ? await GetLatestReleaseTagAsync(owner, repo)
                 : await GetReleaseByTagAsync(owner, repo, tag);
@@ -34,6 +45,8 @@ namespace GitHubAPI {
         }
 
         public async Task DownloadReleaseAssetAsync(string savePath, string owner, string repo, string assetName, string tag = "latest") {
+            EnsurePathExists(System.IO.Path.GetDirectoryName(savePath));
+
             var release = await GetReleaseByTagAsync(owner, repo, tag);
             var asset = release.Assets
                 .Where(a => a.Name == assetName)
@@ -43,6 +56,8 @@ namespace GitHubAPI {
         }
 
         public async Task DownloadReleaseAssetWithFileExtensionAsync(string savePath, string owner, string repo, string fileExtension, string tag = "latest") {
+            EnsurePathExists(System.IO.Path.GetDirectoryName(savePath));
+
             var release = await GetReleaseByTagAsync(owner, repo, tag);
             var asset = release.Assets
                 .Where(a => a.FileExtension == fileExtension)

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using ThunderstoreAPI.Entities;
-using UnityEngine;
 
 namespace ThunderstoreAPI {
     public partial class ThunderstoreApiClient {
@@ -18,12 +18,12 @@ namespace ThunderstoreAPI {
             if(cachedCategories.TryGetValue("categories", out Category[] cachedCategoriesEntry)) {
                 return cachedCategoriesEntry;
             }
-            
+
             return GetCategoriesAsync().Result;
         }
 
         public void Publish(PublishOption publishOption, Byte[] data, string token) {
-            PublishAsync(publishOption, data, token).Wait();
+            Task.Run(() => PublishAsync(publishOption, data, token)).Wait();
         }
     }
 }
