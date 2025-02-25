@@ -1,5 +1,5 @@
 {
-    "name": "URMT.ModManager",
+    "name": "URMT.Template",
     "references": [
         "URMT.Core",
         "GitHubAPI"
@@ -12,7 +12,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Newtonsoft.Json.dll"
+        "Newtonsoft.Json.dll",
+        "BepInEx.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": []

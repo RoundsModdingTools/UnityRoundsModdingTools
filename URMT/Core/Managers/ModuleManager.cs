@@ -10,6 +10,8 @@ namespace URMT.Core.Managers {
         private static List<ModuleInfo> moduleList { get; } = new List<ModuleInfo>();
         public static IReadOnlyList<ModuleInfo> LoadedModules => moduleList.AsReadOnly();
 
+        public static event Action OnAllModulesLoaded = delegate { };
+
         static ModuleManager() {
             LoadModules();
         }
@@ -65,6 +67,7 @@ namespace URMT.Core.Managers {
                 }
             }
 
+            OnAllModulesLoaded();
         }
 
         private static string CheckIfValidModule(Type type) {

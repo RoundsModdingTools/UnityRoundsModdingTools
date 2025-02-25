@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace URMT.Core.Utils {
+﻿namespace URMT.Core.Utils {
     public static class LoggerUtils {
         public static void Log(string message) {
             if(!CoreModule.Instance.EnableDebugLogging) return;
@@ -14,7 +12,7 @@ namespace URMT.Core.Utils {
         }
 
         public static void LogWarning(string message) {
-            if (!CoreModule.Instance.EnableDebugLogging) return;
+            if(!CoreModule.Instance.EnableDebugLogging) return;
 
             UnityEngine.Debug.LogWarning(message);
         }

@@ -1,5 +1,4 @@
 ﻿using GitHubAPI;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -60,6 +59,9 @@ namespace URMT.ModManager.Windows {
                             string firstDirectoryPath = Directory.GetDirectories(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"))[0];
 
                             ConvertToUnityProject(firstDirectoryPath);
+
+                            File.Delete(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}.zip"));
+                            Directory.Delete(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"), true);
                         }
                     } else {
                         ConvertToUnityProject(modPath);
@@ -92,9 +94,7 @@ namespace URMT.ModManager.Windows {
                     return;
                 }
 
-                foreach(AssemblyDefinition assemblyDefinition in assemblyDefinitions) {
-                    MessageBus.SendMessage("AddFolderMappings", assemblyDefinitions.Select(x => (x.Name, "Libraries")).ToArray());
-                }
+                MessageBus.SendMessage("AddFolderMappings", assemblyDefinitions.Select(x => (x.Name, "Libraries")).ToArray());
 
                 AssetDatabase.Refresh();
             }

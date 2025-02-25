@@ -7,6 +7,9 @@ namespace URMT.Core.Utils {
             DirectoryInfo sourceDir = new DirectoryInfo(sourceDirPath);
             DirectoryInfo destDir = new DirectoryInfo(destDirPath);
 
+            blacklistedDirectory = blacklistedDirectory == null ? new string[0] : blacklistedDirectory;
+            blacklistedFileExtension = blacklistedFileExtension == null ? new string[0] : blacklistedFileExtension.Select(ext => ext.Replace(".", "")).ToArray();
+
             if(!destDir.Exists) {
                 destDir.Create();
             }
