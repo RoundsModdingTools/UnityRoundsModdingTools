@@ -12,8 +12,8 @@ using URMT.Core.UI;
 namespace URMT.ModManager.Windows {
     public class ModAssemblyListWindow : EditorWindow {
         private static Dictionary<string, bool> selectedMods;
-        private static readonly string[] ingoredGetAllAssemblyDefinition = new string[] {
-            "URMT" ,
+        private static readonly string[] ingoredGetAllAssemblyDefinition = {
+            "URMT",
             "ThunderstoreAPI",
             "GitHubAPI",
         };
@@ -44,9 +44,9 @@ namespace URMT.ModManager.Windows {
         }
 
         private void OnGUI() {
-            GUIUtils.DrawTitle("Mod Assembly List");
-
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Width(EditorGUIUtility.currentViewWidth), GUILayout.Height(Screen.height - 30));
+
+            GUIUtils.DrawTitle("Mod Assembly List");
 
             modAssemblyList.DoLayoutList();
 
@@ -61,14 +61,14 @@ namespace URMT.ModManager.Windows {
                     messageBuilder.AppendLine("Are you sure you want to delete the following mods?");
                     messageBuilder.AppendLine();
 
-                    foreach(string assembly in selectedAssemblyDefinitions.Select(assembly => Path.GetFileNameWithoutExtension(assembly.Name))) {
+                    foreach(string assembly in selectedAssemblyDefinitions.Select(assembly => assembly.Name)) {
                         messageBuilder.AppendLine($"- {assembly}");
                     }
 
                     bool result = EditorUtility.DisplayDialog("Confirm Deletion", messageBuilder.ToString(), "Yes", "Cancel");
                     if(result) {
                         foreach(var assembly in selectedAssemblyDefinitions) {
-                            MessageBus.SendMessage("RemoveFolderMappings", Path.GetFileNameWithoutExtension(assembly.Name));
+                            MessageBus.SendMessage("RemoveFolderMappings", assembly.Name);
                             Directory.GetParent(assembly.AssemblyPath).Delete(true);
                             selectedMods.Remove(assembly.AssemblyPath);
                         }
@@ -80,9 +80,10 @@ namespace URMT.ModManager.Windows {
 
             EditorGUILayout.EndScrollView();
         }
+        
+        private List<string> modKeys => selectedMods.Keys.ToList();
 
         private void CreateModList() {
-            var modKeys = selectedMods.Keys.ToList(); // Capture keys in a list to maintain indexing
             modAssemblyList = new ReorderableList(modKeys, typeof(string), false, true, false, false);
 
             modAssemblyList.drawHeaderCallback = rect => {
@@ -93,13 +94,15 @@ namespace URMT.ModManager.Windows {
                 if(index < 0 || index >= modKeys.Count)
                     return;
 
+                rect.y += 2;
+
                 var modKey = modKeys[index]; // Ensure we use the correct key
                 var modName = Path.GetFileNameWithoutExtension(modKey); // Remove path for cleaner display
                 var toggleValue = selectedMods[modKey]; // Correctly reference the dictionary key
 
-                var labelRect = new Rect(rect.x, rect.y + 2, rect.width - 40, EditorGUIUtility.singleLineHeight);
-                var toggleRect = new Rect(rect.x + rect.width - 15, rect.y + 2, 20, EditorGUIUtility.singleLineHeight);
-                var buttonRect = new Rect(rect.x + rect.width - 70, rect.y + 2, 50, EditorGUIUtility.singleLineHeight);
+                var labelRect = new Rect(rect.x, rect.y, rect.width - 40, EditorGUIUtility.singleLineHeight);
+                var toggleRect = new Rect(rect.x + rect.width - 15, rect.y, 20, EditorGUIUtility.singleLineHeight);
+                var buttonRect = new Rect(rect.x + rect.width - 70, rect.y, 50, EditorGUIUtility.singleLineHeight);
 
                 EditorGUI.LabelField(labelRect, modName, EditorStyles.boldLabel);
                 selectedMods[modKey] = EditorGUI.Toggle(toggleRect, toggleValue);
