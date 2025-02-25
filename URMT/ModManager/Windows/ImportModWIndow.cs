@@ -52,16 +52,18 @@ namespace URMT.ModManager.Windows {
 
                 if(GUILayout.Button("Import Mod")) {
                     if(selectedOwner != null) {
-                        using(GitHubClient client = new GitHubClient()) {
-                            client.DownloadGithubZip(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}.zip"), selectedOwner, selectedRepo);
+                        string tempPath = Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}");
 
-                            ZipFile.ExtractToDirectory(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}.zip"), Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"));
-                            string firstDirectoryPath = Directory.GetDirectories(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"))[0];
+                        using(GitHubClient client = new GitHubClient()) {
+                            client.DownloadGithubZip($"{tempPath}.zip", selectedOwner, selectedRepo);
+
+                            ZipFile.ExtractToDirectory($"{tempPath}.zip", Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"));
+                            string firstDirectoryPath = Directory.GetDirectories(tempPath)[0];
 
                             ConvertToUnityProject(firstDirectoryPath);
 
-                            File.Delete(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}.zip"));
-                            Directory.Delete(Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"), true);
+                            File.Delete($"{tempPath}.zip");
+                            Directory.Delete(tempPath, true);
                         }
                     } else {
                         ConvertToUnityProject(modPath);

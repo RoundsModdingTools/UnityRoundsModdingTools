@@ -33,7 +33,7 @@ namespace URMT.Windows {
         private static ReorderableList assemblyReferencesList;
         private static ReorderableList precompiledAssembliesList;
 
-        [MenuItem("URMT/Create Mod")]
+        [MenuItem("URMT/Mod Manager/Create Mod")]
         private static void ShowWindow() {
             GetWindow(typeof(CreateModWindow), false, "Create Mod");
         }
