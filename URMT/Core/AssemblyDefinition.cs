@@ -39,7 +39,7 @@ namespace URMT.Core {
         private static string[] Dlls {
             get {
                 if(_dlls == null) {
-                    _dlls = Directory.GetFiles("Library/ScriptAssemblies", "*.dll")
+                    _dlls = Directory.GetFiles(Application.dataPath, "*.dll", SearchOption.AllDirectories)
                         .Select(Path.GetFileNameWithoutExtension)
                         .ToArray();
                 }
@@ -140,7 +140,7 @@ namespace URMT.Core {
                 bool isDefault = DefaultReferences.Any(x => Include.StartsWith(x));
 
                 if(isPrecompiled && !isDefault) {
-                    precompiledReferences.Add(Include);
+                    precompiledReferences.Add($"{Include}.dll");
                 } else if(!isDefault) {
                     references.Add(Include);
                 }

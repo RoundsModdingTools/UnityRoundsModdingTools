@@ -15,7 +15,6 @@ namespace URMT.Core {
         [Header("General Settings")]
         public string DllsFolderPath = Path.Combine("Assets", "Scripts", "Dlls");
         public string ModsFolderPath = Path.Combine("Assets", "Scripts", "Mods");
-        public string BepinexFolderPath = Path.Combine("Assets", "Scripts", "Mods", "Bepinex and Harmony");
         public string TempPath = Path.Combine(Path.GetTempPath(), "UnityRoundsModdingTools");
 
         [Header("Debug Settings")]
