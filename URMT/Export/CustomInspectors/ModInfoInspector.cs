@@ -177,10 +177,19 @@ namespace URMT.Export.CustomInspectors {
              
             includeInAllExports.boolValue = EditorGUILayout.Toggle("Include In All Exports", includeInAllExports.boolValue);
             GUILayout.Space(10);
+
+            EditorGUI.BeginChangeCheck();
+
             GUILayout.Label("Pre Build Command");
             beforeBuildCommand.stringValue = EditorGUILayout.TextArea(beforeBuildCommand.stringValue, GUILayout.Height(100));
             GUILayout.Label("Post Build Command");
             afterBuildCommand.stringValue = EditorGUILayout.TextArea(afterBuildCommand.stringValue, GUILayout.Height(100));
+
+            if(EditorGUI.EndChangeCheck()) {
+                serializedObject.ApplyModifiedProperties();
+                modInfo.CreatePowerShellScript();
+                modInfo.GenerateScripts();
+            }
 
             string modDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(modInfo));
             string readmePath = Path.Combine(modDirectory, "README.md");
@@ -225,8 +234,6 @@ namespace URMT.Export.CustomInspectors {
             if(GUI.changed) {
                 serializedObject.ApplyModifiedProperties();
                 EditorUtility.SetDirty(target);
-                modInfo.CreatePowerShellScript();
-                modInfo.GenerateScripts();
             }
         }
     }
