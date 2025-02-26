@@ -4,6 +4,8 @@ using URMT.Core.Utils;
 
 namespace URMT.Core {
     public class Solution {
+        public static readonly Solution UnitySolution = new Solution(Directory.GetCurrentDirectory());
+
         private static string[] BlacklistedDirectory = new string[] {
             "obj",
             "bin",
