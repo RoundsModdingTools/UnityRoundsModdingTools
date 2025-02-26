@@ -83,7 +83,7 @@ namespace URMT.Export.ScriptableObjects {
 
             AfterBuildPowerShell.AddLine(builder.ToString());
             
-            BeforeBuildPowerShell.AddLine(BeforeBuildCommand);
+            BeforeBuildPowerShell.AddLine($"\n{BeforeBuildCommand}");
             AfterBuildPowerShell.AddLine(AfterBuildCommand);
         }
 
