@@ -27,8 +27,8 @@ namespace URMT.Export.AssetPostprocessors {
 
             for(int i = 0; i < lines.Length; i++) {
                 if(lines[i].Contains("<PropertyGroup>")) {
-                    newLines.Insert(i + 1, $"    <PreBuildEvent>\"powershell -ExecutionPolicy Bypass -File \\\"{mod.BeforeBuildPowerShell.Path}\\\"\"</PreBuildEvent>");
-                    newLines.Insert(i + 1, $"    <PostBuildEvent>\"powershell -ExecutionPolicy Bypass -File \\\"{mod.AfterBuildPowerShell.Path}\\\"\"</PostBuildEvent>");
+                    newLines.Insert(i + 1, $"    <PreBuildEvent>powershell -ExecutionPolicy Bypass -File \"{mod.BeforeBuildPowerShell.Path}\"</PreBuildEvent>");
+                    newLines.Insert(i + 1, $"    <PostBuildEvent>powershell -ExecutionPolicy Bypass -File \"{mod.AfterBuildPowerShell.Path}\"</PostBuildEvent>");
                     
                     mod.BeforeBuildPowerShell.GenerateScript();
                     mod.AfterBuildPowerShell.GenerateScript();
