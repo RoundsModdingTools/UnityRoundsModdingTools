@@ -181,9 +181,6 @@ namespace URMT.Export.CustomInspectors {
             beforeBuildCommand.stringValue = EditorGUILayout.TextArea(beforeBuildCommand.stringValue, GUILayout.Height(100));
             GUILayout.Label("Post Build Command");
             afterBuildCommand.stringValue = EditorGUILayout.TextArea(afterBuildCommand.stringValue, GUILayout.Height(100));
-            if(GUILayout.Button("Generate Scripts")) {
-                modInfo.GenerateScripts();
-            }
 
             string modDirectory = Path.GetDirectoryName(AssetDatabase.GetAssetPath(modInfo));
             string readmePath = Path.Combine(modDirectory, "README.md");
