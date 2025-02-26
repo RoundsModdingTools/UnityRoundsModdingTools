@@ -1,28 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
-using UnityEngine;
-using URMT.Core.Managers;
 using URMT.Core.Utils;
 
-namespace URMT.Export.Networking {
+namespace URMT.Networking {
     public class MessageServer : IDisposable {
         private TcpListener listener;
         private Thread serverThread;
-        private CancellationTokenSource CancellationToken = new CancellationTokenSource();
+        private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
-        public MessageServer(string ip, int port) {
+        private static Dictionary<string, Action<object[]>> messageHandlers = new Dictionary<string, Action<object[]>>();
+
+        public event Action<MessageServer> OnServerStarted;
+        public string IP { get; private set; }
+        public int Port { get; private set; }
+
+        internal MessageServer(string ip, int port) {
             StartServer(ip, port);
         }
 
-        public void Dispose() {
+        public static void RegisterMessage(string message, Action<object[]> action) {
+            if(messageHandlers.ContainsKey(message)) {
+                messageHandlers[message] += action;
+            } else {
+                messageHandlers[message] = action;
+            }
+        }
+
+        public void StopServer() {
+            listener?.Stop();
+            cancellationToken.Cancel();
+
+            if(serverThread != null && serverThread.IsAlive) {
+                serverThread.Join();
+            }
+        }
+
+        public void RestartServer(string ip, int port) {
             StopServer();
+            StartServer(ip, port);
         }
 
         private void StartServer(string ip, int port) {
-            // Start a new thread to listen for incoming messages
+            IP = ip;
+            Port = port;
+
             Thread serverThread = new Thread(() => {
                 try {
                     // Create a new TCP listener
@@ -32,7 +56,7 @@ namespace URMT.Export.Networking {
                         LoggerUtils.Log("Listening for messages on {0}:{1}", ip, port);
                     });
                     // Loop forever, accepting new connections and processing messages
-                    while(!CancellationToken.Token.IsCancellationRequested) {
+                    while(!cancellationToken.Token.IsCancellationRequested) {
                         // Accept a new connection
                         TcpClient client = listener.AcceptTcpClient();
                         NetworkStream stream = client.GetStream();
@@ -68,15 +92,8 @@ namespace URMT.Export.Networking {
 
             serverThread.IsBackground = true;
             serverThread.Start();
-        }
 
-        public void StopServer() {
-            listener?.Stop();
-            CancellationToken.Cancel();
-
-            if(serverThread != null && serverThread.IsAlive) {
-                serverThread.Join();
-            }
+            OnServerStarted?.Invoke(this);
         }
 
         private void ProcessMessage(string message) {
@@ -100,10 +117,9 @@ namespace URMT.Export.Networking {
                 LoggerUtils.Log("Received message: {0}({1})", messageName, string.Join(", ", args));
             });
 
-            MethodInfo method = typeof(MessageBus).GetMethod(nameof(MessageBus.SendMessage));
 
             MainThreadAction.Invoke(() => {
-                method.Invoke(null, new object[] { messageName, args });
+                SendMessage(messageName, args);
             });
         }
 
@@ -113,6 +129,17 @@ namespace URMT.Export.Networking {
             }
             return input;
         }
-    }
 
+        private void SendMessage(string message, object[] args) {
+            if(messageHandlers.ContainsKey(message)) {
+                messageHandlers[message]?.Invoke(args);
+            }
+        }
+
+        public void Dispose() {
+            StopServer();
+
+            cancellationToken.Dispose();
+        }
+    }
 }

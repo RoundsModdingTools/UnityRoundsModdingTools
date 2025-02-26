@@ -12,6 +12,7 @@ using UnityEngine;
 using URMT.Core;
 using URMT.Core.Utils;
 using URMT.Export.Entities;
+using URMT.Networking;
 
 namespace URMT.Export.ScriptableObjects {
     [CreateAssetMenu(fileName = "ModInfo", menuName = "URMT/Mod Info", order = 0)]
@@ -66,11 +67,11 @@ namespace URMT.Export.ScriptableObjects {
 
             BeforeBuildPowerShell.AddLine($"$AssemblyName = \"{ModAssemblyDefinition.Name}\"");
             BeforeBuildPowerShell.AddLine($"$AssemblyPath = \"{ModAssemblyDefinition.AssemblyPath}\"");
-            BeforeBuildPowerShell.AddLine($"$MessageServerIP = \"{ExportModule.MESSAGE_SERVER_PORT}\"");
+            BeforeBuildPowerShell.AddLine($"$MessageServerIP = \"{NetworkingModuleSettings.Instance.Port}\"");
 
             AfterBuildPowerShell.AddLine($"$AssemblyName = \"{ModAssemblyDefinition.Name}\"");
             AfterBuildPowerShell.AddLine($"$AssemblyPath = \"{ModAssemblyDefinition.AssemblyPath}\"");
-            AfterBuildPowerShell.AddLine($"$MessageServerIP = \"{ExportModule.MESSAGE_SERVER_PORT}\"");
+            AfterBuildPowerShell.AddLine($"$MessageServerIP = \"{NetworkingModuleSettings.Instance.Port}\"");
 
             StringBuilder builder = new StringBuilder();
             builder.AppendLine();
@@ -92,6 +93,24 @@ namespace URMT.Export.ScriptableObjects {
 
             BeforeBuildPowerShell.GenerateScript();
             AfterBuildPowerShell.GenerateScript();
+        }
+
+        public static void GenerateAllScripts() {
+            string[] modInfoGuids = AssetDatabase.FindAssets("t:ModInfo");
+            List<ModInfo> modInfos = new List<ModInfo>();
+            foreach(string guid in modInfoGuids) {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                ModInfo modInfo = AssetDatabase.LoadAssetAtPath<ModInfo>(assetPath);
+                modInfos.Add(modInfo);
+            }
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            foreach(ModInfo modInfo in modInfos) {
+                modInfo.CreatePowerShellScript();
+                modInfo.GenerateScripts();
+            }
+            stopwatch.Stop();
+            UnityEngine.Debug.Log($"Generated scripts for {modInfos.Count} mods in {stopwatch.ElapsedMilliseconds}ms");
         }
 
         public static void ExportAll() {

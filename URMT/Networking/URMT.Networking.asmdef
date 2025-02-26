@@ -1,19 +1,14 @@
 {
-    "name": "URMT.Export",
+    "name": "URMT.Networking",
     "references": [
-        "URMT.Core",
-        "URMT.Networking"
+        "URMT.Core"
     ],
     "optionalUnityReferences": [],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
-    "precompiledReferences": [
-        "Newtonsoft.Json.dll"
-    ],
+    "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": []
 }
