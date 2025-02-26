@@ -35,17 +35,31 @@ namespace URMT.Export.ScriptableObjects {
 
         public bool IncludeInAllExports = true;
 
+        public AssemblyDefinition ModAssemblyDefinition {
+            get {
+                string assetPath = AssetDatabase.GetAssetPath(this);
+                string parentDirectoryPath = new FileInfo(assetPath).Directory.FullName;
+
+                string[] assemblyDefinitionPaths = Directory.GetFiles(parentDirectoryPath, "*.asmdef");
+                return assemblyDefinitionPaths.Length > 0
+                    ? AssemblyDefinition.Load(assemblyDefinitionPaths[0])
+                    : null;
+            }
+        }
+
         public void OnEnable() {
             CreatePowerShellScript();
             GenerateScripts();
         }
 
         public void CreatePowerShellScript() {
-            string assetPath = AssetDatabase.GetAssetPath(this);
-            string parentDirectoryPath = new FileInfo(assetPath).Directory.FullName;
+            if (ModAssemblyDefinition == null) return;
 
-            string beforeBuildPath = Path.Combine(parentDirectoryPath, "BeforeBuild.ps1");
-            string afterBuildPath = Path.Combine(parentDirectoryPath, "AfterBuild.ps1");
+            string resourcePath = Path.Combine(Application.dataPath, "Resources", "UnityRoundsModdingTools", "ModPowerShellScripts", ModAssemblyDefinition.Name);
+            if(!Directory.Exists(resourcePath)) Directory.CreateDirectory(resourcePath);
+
+            string beforeBuildPath = Path.Combine(resourcePath, "BeforeBuild.ps1");
+            string afterBuildPath = Path.Combine(resourcePath, "AfterBuild.ps1");
 
             BeforeBuildPowerShell = new PowerShellCodeGenerator(beforeBuildPath);
             AfterBuildPowerShell = new PowerShellCodeGenerator(afterBuildPath);
@@ -74,6 +88,8 @@ namespace URMT.Export.ScriptableObjects {
         }
 
         public void GenerateScripts() {
+            if(ModAssemblyDefinition == null) return;
+
             BeforeBuildPowerShell.GenerateScript();
             AfterBuildPowerShell.GenerateScript();
         }
@@ -115,18 +131,6 @@ namespace URMT.Export.ScriptableObjects {
 
             if (mod != null) {
                 mod.ExportMod();
-            }
-        }
-
-        public AssemblyDefinition ModAssemblyDefinition {
-            get {
-                string assetPath = AssetDatabase.GetAssetPath(this);
-                string parentDirectoryPath = new FileInfo(assetPath).Directory.FullName;
-
-                string[] assemblyDefinitionPaths = Directory.GetFiles(parentDirectoryPath, "*.asmdef");
-                return assemblyDefinitionPaths.Length > 0
-                    ? AssemblyDefinition.Load(assemblyDefinitionPaths[0])
-                    : null;
             }
         }
 
