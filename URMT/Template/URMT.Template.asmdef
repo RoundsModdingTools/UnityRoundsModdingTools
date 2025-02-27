@@ -2,6 +2,7 @@
     "name": "URMT.Template",
     "references": [
         "URMT.Core",
+        "URMT.General",
         "GitHubAPI"
     ],
     "optionalUnityReferences": [],

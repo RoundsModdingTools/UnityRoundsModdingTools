@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using URMT.Core.Managers;
+using URMT.General;
 
 namespace URMT.Template.Templates {
     public class ModTemplateHandler : ITemplateHandler {
@@ -75,7 +76,7 @@ namespace URMT.Template.Templates {
                 AssetImporter.GetAtPath(assetPath).SetAssetBundleNameAndVariant(assetBundleName, "");
             }
 
-            MessageBus.SendMessage("AddModBundleMappings", new (string, string)[] { (safeModName, assetBundleName) });
+            GeneralModule.AddModBundleMapping(safeModName, assetBundleName);
         }
     }
 }

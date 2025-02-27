@@ -8,6 +8,7 @@ using UnityEngine;
 using URMT.Core;
 using URMT.Core.Managers;
 using URMT.Core.UI;
+using URMT.General;
 
 namespace URMT.ModManager.Windows {
     public class ModAssemblyListWindow : EditorWindow {
@@ -68,7 +69,7 @@ namespace URMT.ModManager.Windows {
                     bool result = EditorUtility.DisplayDialog("Confirm Deletion", messageBuilder.ToString(), "Yes", "Cancel");
                     if(result) {
                         foreach(var assembly in selectedAssemblyDefinitions) {
-                            MessageBus.SendMessage("RemoveFolderMappings", assembly.Name);
+                            GeneralModule.RemoveFolderMapping(assembly.Name);
                             Directory.GetParent(assembly.AssemblyPath).Delete(true);
                             selectedMods.Remove(assembly.AssemblyPath);
                         }

@@ -8,8 +8,8 @@ using URMT.Core.Utils;
 namespace URMT.Networking {
     public class MessageServer : IDisposable {
         private TcpListener listener;
-        private Thread serverThread;
-        private CancellationTokenSource cancellationToken = new CancellationTokenSource();
+        private readonly Thread serverThread;
+        private readonly CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
         private static Dictionary<string, Action<object[]>> messageHandlers = new Dictionary<string, Action<object[]>>();
 

@@ -8,6 +8,7 @@ using URMT.Core;
 using URMT.Core.Managers;
 using URMT.Core.UI;
 using URMT.Core.Utils;
+using URMT.General;
 
 namespace URMT.ModManager.Windows {
     public class ImportModWIndow : EditorWindow {
@@ -96,7 +97,9 @@ namespace URMT.ModManager.Windows {
                     return;
                 }
 
-                MessageBus.SendMessage("AddFolderMappings", assemblyDefinitions.Select(x => (x.Name, "Libraries")).ToArray());
+                foreach(var assembly in assemblyDefinitions) {
+                    GeneralModule.AddFolderMapping(assembly.Name, "Libraries");
+                }
 
                 AssetDatabase.Refresh();
             }
