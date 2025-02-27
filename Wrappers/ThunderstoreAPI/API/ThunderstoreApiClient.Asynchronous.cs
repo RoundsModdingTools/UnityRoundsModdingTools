@@ -52,6 +52,29 @@ namespace ThunderstoreAPI {
             return packages;
         }
 
+        public async Task DownloadPackageAsync(Package package, string downloadPath, string targetVersion = null) {
+            if (targetVersion != null && !package.Versions.Any(v => v.VersionNumber == targetVersion)) {
+                throw new ArgumentException("The specified version does not exist in the package.", nameof(targetVersion));
+            }
+
+            PackageVersion version = targetVersion != null
+                ? package.Versions.FirstOrDefault(v => v.VersionNumber == targetVersion)
+                : package.Versions.FirstOrDefault(v => v.IsActive);
+
+            var request = requestBuilder
+                .StartNew()
+                .WithEndpoint(version.DownloadUrl)
+                .WithMethod(HttpMethod.Get)
+                .Build();
+
+            using(var response = await client.SendAsync(request)) {
+                response.EnsureSuccessStatusCode();
+                using(var fileStream = System.IO.File.Create(downloadPath)) {
+                    await response.Content.CopyToAsync(fileStream);
+                }
+            }
+        }
+
         public async Task<Category[]> GetCategoriesAsync() {
             if(cachedCategories.TryGetValue("categories", out Category[] cachedCategoriesEntry)) {
                 return cachedCategoriesEntry;

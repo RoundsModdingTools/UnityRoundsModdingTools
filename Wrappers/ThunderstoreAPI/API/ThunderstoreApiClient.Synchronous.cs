@@ -14,6 +14,10 @@ namespace ThunderstoreAPI {
             return GetPackagesAsync(community).Result;
         }
 
+        public void DownloadPackage(Package package, string downloadPath, string targetVersion = null) {
+            Task.Run(() => DownloadPackageAsync(package, downloadPath, targetVersion)).Wait();
+        }
+
         public Category[] GetCategories() {
             if(cachedCategories.TryGetValue("categories", out Category[] cachedCategoriesEntry)) {
                 return cachedCategoriesEntry;
