@@ -10,6 +10,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using URMT.Core;
+using URMT.Core.UI;
 using URMT.Core.Utils;
 using URMT.ModManager;
 
@@ -26,6 +27,10 @@ namespace Thunderstore.Windows {
 
         private static Package[] packages = new Package[0];
         private static Package[] shownPackages = new Package[0];
+
+        private static Category[] categories = new Category[0];
+        private static bool[] selectedCategories = new bool[0];
+
         private static string searchQuery = "";
         private PackageSortType sortType;
 
@@ -48,14 +53,7 @@ namespace Thunderstore.Windows {
             packages = new Package[0];
             shownPackages = new Package[0];
 
-            if(client == null) {
-                client = new ThunderstoreApiClient(TimeSpan.FromMinutes(5));
-
-                AppDomain.CurrentDomain.DomainUnload += (sender, args) => {
-                    client?.Dispose();
-                };
-
-            }
+            SetupThunderstoreClient();
 
             await GetPackages();
         }
@@ -63,24 +61,18 @@ namespace Thunderstore.Windows {
         private void OnGUI() {
             EditorGUILayout.LabelField("Thunderstore", EditorStyles.boldLabel);
             if(modList == null) CreateModList();
-            if(client == null) {
-                client = new ThunderstoreApiClient(TimeSpan.FromMinutes(5));
+            SetupThunderstoreClient();
 
-                AppDomain.CurrentDomain.DomainUnload += (sender, args) => {
-                    client?.Dispose();
-                };
-
-            }
-
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchQuery = EditorGUILayout.TextField(searchQuery);
+            searchQuery = EditorGUILayout.TextField("Search:", searchQuery);
             sortType = (PackageSortType)EditorGUILayout.EnumPopup("Sort by:", sortType);
-
 
             if(packages.Length == 0) {
                 EditorGUILayout.LabelField("Loading packages...");
                 return;
             }
+
+            GUIUtils.CreateMultSelectDropdown("Whitelest Channel:", "Categories", categories.Select(category => category.Name).ToList(), selectedCategories);
+            GUILayout.Space(5);
 
             shownPackages = GetShowenPackage();
             modList.list = shownPackages;
@@ -96,6 +88,8 @@ namespace Thunderstore.Windows {
             return sortedPackages
                 .Where(x => x.FullName.ToLower()
                 .Contains(searchQuery.ToLower()))
+                .Where(x => !selectedCategories.Any(s => s) || x.Categories.Any(c => selectedCategories[Array.IndexOf(categories.Select(cat => cat.Name).ToArray(), c)]))
+                .Take(100)
                 .ToArray();
         }
 
@@ -134,7 +128,6 @@ namespace Thunderstore.Windows {
 
             Repaint();
         }
-
 
         private void CreateModList() {
             modList = new ReorderableList(shownPackages, typeof(Package),
@@ -232,6 +225,17 @@ namespace Thunderstore.Windows {
                     LoggerUtils.Log($"View: {package.FullName}");
                 }
             };
+        }
+        private void SetupThunderstoreClient() {
+            if(client == null) {
+                client = new ThunderstoreApiClient(TimeSpan.FromMinutes(5));
+                AppDomain.CurrentDomain.DomainUnload += (sender, args) => {
+                    client?.Dispose();
+                };
+
+                categories = client.GetCategories(COMMUNITY);
+                selectedCategories = new bool[categories.Length];
+            }
         }
     }
 }
