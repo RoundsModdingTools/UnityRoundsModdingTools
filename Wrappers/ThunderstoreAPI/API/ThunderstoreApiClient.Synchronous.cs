@@ -18,12 +18,12 @@ namespace ThunderstoreAPI {
             Task.Run(() => DownloadPackageAsync(package, downloadPath, targetVersion)).Wait();
         }
 
-        public Category[] GetCategories() {
-            if(cachedCategories.TryGetValue("categories", out Category[] cachedCategoriesEntry)) {
+        public Category[] GetCategories(string community) {
+            if(cachedCategories.TryGetValue(community, out Category[] cachedCategoriesEntry)) {
                 return cachedCategoriesEntry;
             }
 
-            return GetCategoriesAsync().Result;
+            return GetCategoriesAsync(community).Result;
         }
 
         public void Publish(PublishOption publishOption, Byte[] data, string token) {

@@ -69,14 +69,14 @@ namespace ThunderstoreAPI {
             }
         }
 
-        public async Task<Category[]> GetCategoriesAsync() {
-            if(cachedCategories.TryGetValue("categories", out Category[] cachedCategoriesEntry)) {
+        public async Task<Category[]> GetCategoriesAsync(string community) {
+            if(cachedCategories.TryGetValue(community, out Category[] cachedCategoriesEntry)) {
                 return cachedCategoriesEntry;
             }
 
             var request = requestBuilder
                 .StartNew()
-                .WithEndpoint("/api/v1/category/")
+                .WithEndpoint($"/api/experimental/community/{community}/category/")
                 .WithMethod(HttpMethod.Get)
                 .Build();
 
@@ -84,7 +84,7 @@ namespace ThunderstoreAPI {
                 var content = await response.Content.ReadAsStringAsync();
 
                 Category[] categories = JsonConvert.DeserializeObject<Category[]>(content);
-                cachedCategories["categories"] = categories;
+                cachedCategories[community] = categories;
 
                 response.EnsureSuccessStatusCode();
 
