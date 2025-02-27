@@ -176,23 +176,28 @@ namespace Thunderstore.Windows {
                     && package.Versions[0].WebsiteUrl != "https://github.com/thunderstore-io"
                     && GUI.Button(buttonRect1, "Import From Source")
                 ) {
-                    using(GitHubClient client = new GitHubClient()) {
-                        (string selectedOwner, string selectedRepo) = GithubUtils.ExtractOwnerAndRepo(package.Versions[0].WebsiteUrl);
+                    bool import = EditorUtility.DisplayDialog("Import Mod",
+                        $"Are you sure you want to import '{name}'?", "Yes", "No");
 
-                        if(!Directory.Exists(tempDownloadPath))
-                            Directory.CreateDirectory(tempDownloadPath);
+                    if(import) {
+                        using(GitHubClient client = new GitHubClient()) {
+                            (string selectedOwner, string selectedRepo) = GithubUtils.ExtractOwnerAndRepo(package.Versions[0].WebsiteUrl);
 
-                        client.DownloadGithubZip(tempFilePath, selectedOwner, selectedRepo);
+                            if(!Directory.Exists(tempDownloadPath))
+                                Directory.CreateDirectory(tempDownloadPath);
 
-                        ZipFile.ExtractToDirectory(tempFilePath, tempDownloadPath);
-                        string firstDirectoryPath = Directory.GetDirectories(tempDownloadPath)[0];
+                            client.DownloadGithubZip(tempFilePath, selectedOwner, selectedRepo);
 
-                        ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
+                            ZipFile.ExtractToDirectory(tempFilePath, tempDownloadPath);
+                            string firstDirectoryPath = Directory.GetDirectories(tempDownloadPath)[0];
 
-                        Directory.Delete(tempDownloadPath, true);
+                            ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
+
+                            Directory.Delete(tempDownloadPath, true);
+                        }
+
+                        LoggerUtils.Log($"Import from source: {package.FullName}");
                     }
-
-                    LoggerUtils.Log($"Import from source: {package.FullName}");
                 }
 
                 if(GUI.Button(buttonRect2, "Import")) {
