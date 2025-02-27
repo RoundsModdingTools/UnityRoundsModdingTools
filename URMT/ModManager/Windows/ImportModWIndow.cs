@@ -52,16 +52,16 @@ namespace URMT.ModManager.Windows {
                 if(GUILayout.Button("Import Mod")) {
                     if(selectedOwner != null) {
                         string tempPath = Path.Combine(CoreModule.Instance.TempPath, "ImportMod", $"{selectedOwner}-{selectedRepo}");
+                        string filePath = Path.Combine(tempPath, $"{selectedOwner}-{selectedRepo}.zip");
 
                         using(GitHubClient client = new GitHubClient()) {
-                            client.DownloadGithubZip($"{tempPath}.zip", selectedOwner, selectedRepo);
+                            client.DownloadGithubZip(filePath, selectedOwner, selectedRepo);
 
-                            ZipFile.ExtractToDirectory($"{tempPath}.zip", Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"));
+                            ZipFile.ExtractToDirectory(filePath, tempPath);
                             string firstDirectoryPath = Directory.GetDirectories(tempPath)[0];
 
                             ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
 
-                            File.Delete($"{tempPath}.zip");
                             Directory.Delete(tempPath, true);
                         }
                     } else {
