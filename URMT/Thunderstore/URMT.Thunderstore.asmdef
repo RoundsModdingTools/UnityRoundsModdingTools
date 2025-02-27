@@ -3,7 +3,8 @@
     "references": [
         "URMT.Core",
         "URMT.ModManager",
-        "ThunderstoreAPI"
+        "ThunderstoreAPI",
+        "GitHubAPI"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

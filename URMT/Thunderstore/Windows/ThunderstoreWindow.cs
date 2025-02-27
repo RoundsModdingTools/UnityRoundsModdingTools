@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GitHubAPI;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -10,6 +11,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using URMT.Core;
 using URMT.Core.Utils;
+using URMT.ModManager;
 
 namespace Thunderstore.Windows {
     public enum PackageSortType {
@@ -173,12 +175,30 @@ namespace Thunderstore.Windows {
 
                 GUI.Label(modNameRect, name);
 
+                string tempDownloadPath = Path.Combine(CoreModule.Instance.TempPath, "Thunderstore", package.FullName);
+                string tempFilePath = Path.Combine(tempDownloadPath, $"{package.FullName}.zip");
+
                 if(package.Versions[0].WebsiteUrl != ""
                     && package.Versions[0].WebsiteUrl.StartsWith("https://github.com/")
                     && package.Versions[0].WebsiteUrl != "https://github.com/thunderstore-io"
                     && GUI.Button(buttonRect1, "Import From Source")
                 ) {
-                    // TODO: Implement the import from source logic
+                    using(GitHubClient client = new GitHubClient()) {
+                        (string selectedOwner, string selectedRepo) = GithubUtils.ExtractOwnerAndRepo(package.Versions[0].WebsiteUrl);
+
+                        if(!Directory.Exists(tempDownloadPath))
+                            Directory.CreateDirectory(tempDownloadPath);
+
+                        client.DownloadGithubZip(tempFilePath, selectedOwner, selectedRepo);
+
+                        ZipFile.ExtractToDirectory(tempFilePath, tempDownloadPath);
+                        string firstDirectoryPath = Directory.GetDirectories(tempDownloadPath)[0];
+
+                        ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
+
+                        Directory.Delete(tempDownloadPath, true);
+                    }
+
                     LoggerUtils.Log($"Import from source: {package.FullName}");
                 }
 
@@ -187,14 +207,12 @@ namespace Thunderstore.Windows {
                         $"Are you sure you want to import '{name}'?", "Yes", "No");
 
                     if(import) {
-                        string tempDownloadPath = Path.Combine(CoreModule.Instance.TempPath, "Thunderstore", package.FullName);
-                        if(!Directory.Exists(tempDownloadPath)) {
+                        if(!Directory.Exists(tempDownloadPath))
                             Directory.CreateDirectory(tempDownloadPath);
-                        }
 
-                        client.DownloadPackage(package, Path.Combine(tempDownloadPath, $"{package.FullName}.zip"));
+                        client.DownloadPackage(package, tempFilePath);
 
-                        ZipFile.ExtractToDirectory(Path.Combine(tempDownloadPath, $"{package.FullName}.zip"), tempDownloadPath);
+                        ZipFile.ExtractToDirectory(tempFilePath, tempDownloadPath);
 
                         string[] dlls = Directory.GetFiles(tempDownloadPath, "*.dll", SearchOption.AllDirectories);
                         foreach(string dll in dlls) {
