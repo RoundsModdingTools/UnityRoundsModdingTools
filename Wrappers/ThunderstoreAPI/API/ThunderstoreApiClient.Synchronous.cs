@@ -23,7 +23,7 @@ namespace ThunderstoreAPI {
                 return cachedCategoriesEntry;
             }
 
-            return GetCategoriesAsync(community).Result;
+            return Task.Run(() => GetCategoriesAsync(community)).Result;
         }
 
         public void Publish(PublishOption publishOption, Byte[] data, string token) {

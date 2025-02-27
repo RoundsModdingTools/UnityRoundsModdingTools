@@ -83,12 +83,12 @@ namespace ThunderstoreAPI {
             using(var response = await client.SendAsync(request)) {
                 var content = await response.Content.ReadAsStringAsync();
 
-                Category[] categories = JsonConvert.DeserializeObject<Category[]>(content);
-                cachedCategories[community] = categories;
+                CategoryResponse categoryResponse = JsonConvert.DeserializeObject<CategoryResponse>(content);
+                cachedCategories[community] = categoryResponse.Categories;
 
                 response.EnsureSuccessStatusCode();
 
-                return categories;
+                return categoryResponse.Categories;
             }
         }
 

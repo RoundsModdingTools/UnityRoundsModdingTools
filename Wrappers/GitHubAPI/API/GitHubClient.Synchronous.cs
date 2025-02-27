@@ -20,19 +20,19 @@ namespace GitHubAPI {
         }
 
         public GitHubRelease GetLatestReleaseTag(string owner, string repo) {
-            return GetLatestReleaseTagAsync(owner, repo).Result;
+            return Task.Run(() => GetLatestReleaseTagAsync(owner, repo)).Result;
         }
 
         public GitHubRelease GetReleaseByTag(string owner, string repo, string tag) {
-            return GetReleaseByTagAsync(owner, repo, tag).Result;
+            return Task.Run(() => GetReleaseByTagAsync(owner, repo, tag)).Result;
         }
 
         public GitHubRelease[] GetReleases(string owner, string repo) {
-            return GetReleasesAsync(owner, repo).Result;
+            return Task.Run(() => GetReleasesAsync(owner, repo)).Result;
         }
 
         public GithubContent GetContentFromPath(string owner, string repo, string path) {
-            return GetContentFromPathAsync(owner, repo, path).Result;
+            return Task.Run(() => GetContentFromPathAsync(owner, repo, path)).Result;
         }
     }
 }
