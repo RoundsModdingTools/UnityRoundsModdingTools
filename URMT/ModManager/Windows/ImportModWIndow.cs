@@ -1,11 +1,9 @@
 ﻿using GitHubAPI;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using URMT.Core;
-using URMT.Core.Managers;
 using URMT.Core.UI;
 using URMT.Core.Utils;
 using URMT.General;
@@ -61,47 +59,16 @@ namespace URMT.ModManager.Windows {
                             ZipFile.ExtractToDirectory($"{tempPath}.zip", Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}"));
                             string firstDirectoryPath = Directory.GetDirectories(tempPath)[0];
 
-                            ConvertToUnityProject(firstDirectoryPath);
+                            ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
 
                             File.Delete($"{tempPath}.zip");
                             Directory.Delete(tempPath, true);
                         }
                     } else {
-                        ConvertToUnityProject(modPath);
+                        ModManagerModule.ConvertToUnityProject(modPath);
                     }
                 }
                 GUI.enabled = true;
-            }
-        }
-
-        private void ConvertToUnityProject(string path) {
-            string[] solutionFiles = Directory.GetFiles(path, "*.sln", SearchOption.AllDirectories);
-            string[] assemblyDefinitionFiles = Directory.GetFiles(path, "*.asmdef", SearchOption.AllDirectories);
-            AssemblyDefinition[] assemblyDefinitions;
-
-            if(solutionFiles.Length > 0) {
-                Solution solution = new Solution(solutionFiles[0]);
-                if(solution.Projects.Length == 1) {
-                    assemblyDefinitions = solution.ConvertToAssemblyDefinitions(CoreModule.Instance.ModsFolderPath);
-                } else if(solution.Projects.Length > 1) {
-                    assemblyDefinitions = solution.ConvertToAssemblyDefinitions(Path.Combine(CoreModule.Instance.ModsFolderPath, Path.GetFileNameWithoutExtension(solutionFiles[0])));
-                } else if(assemblyDefinitionFiles.Length > 0) {
-                    FileSystemUtils.CopyDirectory(path, CoreModule.Instance.ModsFolderPath);
-
-                    assemblyDefinitions = new AssemblyDefinition[assemblyDefinitionFiles.Length];
-                    for(int i = 0; i < assemblyDefinitionFiles.Length; i++) {
-                        assemblyDefinitions[i] = AssemblyDefinition.Load(assemblyDefinitionFiles[i]);
-                    }
-                } else {
-                    Debug.LogError("Failed to find a solution or assembly definition file in the selected directory.");
-                    return;
-                }
-
-                foreach(var assembly in assemblyDefinitions) {
-                    GeneralModule.AddFolderMapping(assembly.Name, "Libraries");
-                }
-
-                AssetDatabase.Refresh();
             }
         }
     }
