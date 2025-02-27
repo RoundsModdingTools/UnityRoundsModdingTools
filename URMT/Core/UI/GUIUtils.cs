@@ -6,19 +6,20 @@ using UnityEngine;
 
 namespace URMT.Core.UI {
     public static class GUIUtils {
-        public static void CreateMultSelectDropdown(string label, string dropLabel, IList<string> options, IList<bool> selected) {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(label, new GUIStyle() {
-                margin = new RectOffset(5, 0, 5, 0)
-            });
-            GUILayout.BeginHorizontal(GUI.skin.textField, GUILayout.Height(19.5f));
+        public static void CreateMultSelectDropdown(
+            string label,
+            string dropLabel,
+            IList<string> options,
+            IList<bool> selected
+        ) {
 
-            GUIStyle buttonStyle = new GUIStyle(EditorStyles.miniButton) {
-                fixedWidth = 25,
-            };
+            EditorGUILayout.BeginHorizontal();
 
-            // Display selected items inline
-            GUILayout.BeginHorizontal();
+            EditorGUILayout.PrefixLabel(label);
+
+            EditorGUILayout.BeginHorizontal(GUI.skin.textField,
+                GUILayout.Height(EditorGUIUtility.singleLineHeight));
+
             for(int i = 0; i < options.Count; i++) {
                 if(selected[i]) {
                     GUIStyle tagStyle = new GUIStyle(EditorStyles.miniButton) {
@@ -31,17 +32,21 @@ namespace URMT.Core.UI {
                     GUILayout.Label($" {options[i]} ", tagStyle);
                 }
             }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
 
-            // Dropdown button on the right when items are selected
-            if(GUILayout.Button("▼", buttonStyle)) {
-                Rect mouseRect = new Rect(Event.current.mousePosition.x, Event.current.mousePosition.y, 0, 0);
-                PopupWindow.Show(mouseRect, new MultSelectPopup(dropLabel, options, selected, EditorWindow.focusedWindow));
+            GUILayout.FlexibleSpace();
+            if(GUILayout.Button("▼", EditorStyles.miniButton, GUILayout.Width(25))) {
+                Rect mouseRect = new Rect(
+                    Event.current.mousePosition.x,
+                    Event.current.mousePosition.y,
+                    0, 0);
+
+                PopupWindow.Show(
+                    mouseRect,
+                    new MultSelectPopup(dropLabel, options, selected, EditorWindow.focusedWindow));
             }
 
-            GUILayout.EndHorizontal();
-            GUILayout.EndHorizontal();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndHorizontal();
         }
 
         public static void DrawAssemblyDefinitionProperty(SerializedProperty property, Rect rect, float width) {

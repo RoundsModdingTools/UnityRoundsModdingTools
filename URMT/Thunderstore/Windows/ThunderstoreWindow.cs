@@ -29,7 +29,8 @@ namespace Thunderstore.Windows {
         private static Package[] shownPackages = new Package[0];
 
         private static Category[] categories = new Category[0];
-        private static bool[] selectedCategories = new bool[0];
+        private static bool[] selectedWhitelistedCategories = new bool[0];
+        private static bool[] selectedBlacklistedCategories = new bool[0];
 
         private static string searchQuery = "";
         private PackageSortType sortType;
@@ -59,7 +60,7 @@ namespace Thunderstore.Windows {
         }
 
         private void OnGUI() {
-            EditorGUILayout.LabelField("Thunderstore", EditorStyles.boldLabel);
+            GUIUtils.DrawTitle("Thunderstore");
             if(modList == null) CreateModList();
             SetupThunderstoreClient();
 
@@ -71,7 +72,9 @@ namespace Thunderstore.Windows {
                 return;
             }
 
-            GUIUtils.CreateMultSelectDropdown("Whitelest Channel:", "Categories", categories.Select(category => category.Name).ToList(), selectedCategories);
+            GUIUtils.CreateMultSelectDropdown("Whitelist Categories:", "Categories", categories.Select(category => category.Name).ToList(), selectedWhitelistedCategories);
+            GUILayout.Space(1);
+            GUIUtils.CreateMultSelectDropdown("Blacklist Categories:", "Categories", categories.Select(category => category.Name).ToList(), selectedBlacklistedCategories);
             GUILayout.Space(5);
 
             shownPackages = GetShowenPackage();
@@ -88,7 +91,8 @@ namespace Thunderstore.Windows {
             return sortedPackages
                 .Where(x => x.FullName.ToLower()
                 .Contains(searchQuery.ToLower()))
-                .Where(x => !selectedCategories.Any(s => s) || x.Categories.Any(c => selectedCategories[Array.IndexOf(categories.Select(cat => cat.Name).ToArray(), c)]))
+                .Where(x => !selectedWhitelistedCategories.Any(s => s) || x.Categories.Any(c => selectedWhitelistedCategories[Array.IndexOf(categories.Select(cat => cat.Name).ToArray(), c)]))
+                .Where(x => !selectedBlacklistedCategories.Any(s => s) || !x.Categories.Any(c => selectedBlacklistedCategories[Array.IndexOf(categories.Select(cat => cat.Name).ToArray(), c)]))
                 .Take(100)
                 .ToArray();
         }
@@ -239,7 +243,8 @@ namespace Thunderstore.Windows {
                 };
 
                 categories = client.GetCategories(COMMUNITY);
-                selectedCategories = new bool[categories.Length];
+                selectedWhitelistedCategories = new bool[categories.Length];
+                selectedBlacklistedCategories = new bool[categories.Length];
             }
         }
     }
