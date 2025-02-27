@@ -61,13 +61,7 @@ namespace ThunderstoreAPI {
                 ? package.Versions.FirstOrDefault(v => v.VersionNumber == targetVersion)
                 : package.Versions.FirstOrDefault(v => v.IsActive);
 
-            var request = requestBuilder
-                .StartNew()
-                .WithEndpoint(version.DownloadUrl)
-                .WithMethod(HttpMethod.Get)
-                .Build();
-
-            using(var response = await client.SendAsync(request)) {
+            using(var response = await client.GetAsync(version.DownloadUrl)) {
                 response.EnsureSuccessStatusCode();
                 using(var fileStream = System.IO.File.Create(downloadPath)) {
                     await response.Content.CopyToAsync(fileStream);

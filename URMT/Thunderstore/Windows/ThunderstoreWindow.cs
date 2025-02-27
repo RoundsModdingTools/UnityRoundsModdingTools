@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using ThunderstoreAPI;
@@ -6,6 +8,7 @@ using ThunderstoreAPI.Entities;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using URMT.Core;
 using URMT.Core.Utils;
 
 namespace Thunderstore.Windows {
@@ -145,52 +148,65 @@ namespace Thunderstore.Windows {
             modList.drawElementCallback = (rect, index, active, focused) => {
                 var package = shownPackages[index];
 
-                // Add some padding at top/bottom
                 rect.y += 2;
                 rect.height = EditorGUIUtility.singleLineHeight;
 
-                // Define button widths
+                // Define button sizes
                 float spacing = 5f;
                 float buttonWidth1 = 130f;
                 float buttonWidth2 = 50f;
                 float buttonWidth3 = 45f;
                 float totalButtonWidth = buttonWidth1 + buttonWidth2 + buttonWidth3 + (spacing * 2);
 
-                // Subtract buttons from total width
                 float contentWidth = rect.width - totalButtonWidth - spacing;
 
-                // Decide how much space ModName vs. Owner each get
-                // e.g. 60% for ModName, 40% for Owner
                 float modNameWidth = contentWidth * 0.6f;
                 float ownerWidth = contentWidth * 0.4f;
 
-                // Define Rects
                 Rect modNameRect = new Rect(rect.x, rect.y, modNameWidth, rect.height);
-                Rect ownerRect = new Rect(rect.x, rect.y, rect.xMax, rect.height);
 
-                // Now define the button rects to the right
                 Rect buttonRect1 = new Rect(rect.xMax - totalButtonWidth, rect.y, buttonWidth1, rect.height);
                 Rect buttonRect2 = new Rect(buttonRect1.xMax + spacing, rect.y, buttonWidth2, rect.height);
                 Rect buttonRect3 = new Rect(buttonRect2.xMax + spacing, rect.y, buttonWidth3, rect.height);
 
-                // Create a centered style (or reuse EditorStyles.centeredGreyMiniLabel, etc.)
-                var centeredStyle = new GUIStyle(GUI.skin.label) {
-                    alignment = TextAnchor.MiddleCenter
-                };
+                string name = $"{package.Owner} - {package.Name.Replace("_", " ")} ({package.Versions[0].VersionNumber})";
 
-                // Draw labels
-                GUI.Label(modNameRect, package.FullName);
-                GUI.Label(ownerRect, package.Owner, centeredStyle);
+                GUI.Label(modNameRect, name);
 
-                // Draw buttons
-                if(GUI.Button(buttonRect1, "Import From Source")) {
+                if(package.Versions[0].WebsiteUrl != ""
+                    && package.Versions[0].WebsiteUrl.StartsWith("https://github.com/")
+                    && package.Versions[0].WebsiteUrl != "https://github.com/thunderstore-io"
+                    && GUI.Button(buttonRect1, "Import From Source")
+                ) {
                     // TODO: Implement the import from source logic
                     LoggerUtils.Log($"Import from source: {package.FullName}");
                 }
 
                 if(GUI.Button(buttonRect2, "Import")) {
-                    // TODO: Implement the import logic
-                    LoggerUtils.Log($"Import: {package.FullName}");
+                    bool import = EditorUtility.DisplayDialog("Import Mod",
+                        $"Are you sure you want to import '{name}'?", "Yes", "No");
+
+                    if(import) {
+                        string tempDownloadPath = Path.Combine(CoreModule.Instance.TempPath, "Thunderstore", package.FullName);
+                        if(!Directory.Exists(tempDownloadPath)) {
+                            Directory.CreateDirectory(tempDownloadPath);
+                        }
+
+                        client.DownloadPackage(package, Path.Combine(tempDownloadPath, $"{package.FullName}.zip"));
+
+                        ZipFile.ExtractToDirectory(Path.Combine(tempDownloadPath, $"{package.FullName}.zip"), tempDownloadPath);
+
+                        string[] dlls = Directory.GetFiles(tempDownloadPath, "*.dll", SearchOption.AllDirectories);
+                        foreach(string dll in dlls) {
+                            File.Copy(dll, Path.Combine(CoreModule.Instance.DllsFolderPath, Path.GetFileName(dll)), true);
+
+                            LoggerUtils.Log($"Imported: {Path.GetFileName(dll)}");
+                        }
+
+                        Directory.Delete(tempDownloadPath, true);
+
+                        LoggerUtils.Log($"Import: {package.FullName}");
+                    }
                 }
 
                 if(GUI.Button(buttonRect3, "View")) {
