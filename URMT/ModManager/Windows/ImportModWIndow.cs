@@ -51,7 +51,7 @@ namespace URMT.ModManager.Windows {
 
                 if(GUILayout.Button("Import Mod")) {
                     if(selectedOwner != null) {
-                        string tempPath = Path.Combine(CoreModule.Instance.TempPath, $"{selectedOwner}-{selectedRepo}");
+                        string tempPath = Path.Combine(CoreModule.Instance.TempPath, "ImportMod", $"{selectedOwner}-{selectedRepo}");
 
                         using(GitHubClient client = new GitHubClient()) {
                             client.DownloadGithubZip($"{tempPath}.zip", selectedOwner, selectedRepo);
