@@ -1,10 +1,18 @@
 ﻿using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace URMT.Utility.Menus {
     public static class CopyMenu {
         [MenuItem("Assets/Copy #z", false, 0)]
         private static void Copy() {
+            foreach(var obj in Selection.objects) {
+                if(AssetDatabase.GetAssetPath(obj) == "Assets") {
+                    Debug.LogWarning("Cannot copy the 'Assets' folder.");
+                    return;
+                }
+            }
+
             CopyHandler.ObjectsToCopy = Selection.objects;
         }
 
