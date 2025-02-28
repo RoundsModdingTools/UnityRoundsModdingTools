@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
@@ -79,6 +80,17 @@ namespace URMT.Core.UI {
             };
             GUILayout.Label(text, headerLabelStyle);
             GUILayout.Space(10);
+        }
+
+        public static void RenderIndented(Action renderAction) {
+            float indentWidth = EditorGUI.indentLevel * 15f;
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(indentWidth);
+            GUILayout.BeginVertical();
+            renderAction();
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
         }
     }
 }
