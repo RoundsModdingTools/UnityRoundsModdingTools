@@ -3,6 +3,7 @@
     "references": [
         "URMT.Core",
         "URMT.ModManager",
+        "URMT.Export",
         "ThunderstoreAPI",
         "GitHubAPI"
     ],
