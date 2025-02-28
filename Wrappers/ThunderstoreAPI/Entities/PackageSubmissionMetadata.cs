@@ -6,7 +6,7 @@ namespace ThunderstoreAPI.Entities {
     public struct PackageSubmissionMetadata {
         [JsonProperty("author_name")] public string AuthorName { get; set; }
 
-        [JsonProperty("categories")] public string[] Categories { get; set; }
+        [JsonProperty("categories", NullValueHandling = NullValueHandling.Ignore)] public string[] Categories { get; set; }
 
         [JsonProperty("communities")] public string[] Communities { get; set; }
 
@@ -14,15 +14,15 @@ namespace ThunderstoreAPI.Entities {
 
         [JsonProperty("upload_uuid")] public Guid UploadUUID { get; set; }
 
-        [JsonProperty("community_categories")] public Dictionary<string, string[]> CommunityCategories { get; set; }
+        [JsonProperty("community_categories", NullValueHandling = NullValueHandling.Ignore)] public Dictionary<string, string[]> CommunityCategories { get; set; }
 
         public PackageSubmissionMetadata(string authorName, string[] categories, string[] communities, bool hasNSFWContent, Guid uploadUUID, Dictionary<string, string[]> communityCategories) {
             AuthorName = authorName;
-            Categories = categories ?? new string[0];
+            Categories = categories;
             Communities = communities ?? new string[0];
             HasNSFWContent = hasNSFWContent;
             UploadUUID = uploadUUID;
-            CommunityCategories = communityCategories ?? new Dictionary<string, string[]>();
+            CommunityCategories = communityCategories;
         }
     }
 }
