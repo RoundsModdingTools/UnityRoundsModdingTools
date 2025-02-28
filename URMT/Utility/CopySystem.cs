@@ -1,5 +1,7 @@
 ﻿using UnityEditor;
+using UnityEngine;
 using System.IO;
+using System.Reflection;
 
 namespace URMT.Utility.Menus {
     public static class CopySystem {
@@ -15,11 +17,10 @@ namespace URMT.Utility.Menus {
 
         [MenuItem("Assets/Paste #x", false, 1)]
         public static void Paste() {
-            var selectionPath = AssetDatabase.GetAssetPath(Selection.activeObject);
+            string selectionPath = AssetDatabase.GetAssetPath(Selection.activeObject);
 
-            // Ensure we're dealing with a folder
-            if(!AssetDatabase.IsValidFolder(selectionPath)) {
-                selectionPath = Path.GetDirectoryName(selectionPath);
+            if(string.IsNullOrEmpty(selectionPath) || !AssetDatabase.IsValidFolder(selectionPath)) {
+                selectionPath = GetActiveFolderPath();
             }
 
             CopyHandler.Paste(selectionPath);
@@ -27,12 +28,29 @@ namespace URMT.Utility.Menus {
 
         [MenuItem("Assets/Paste #x", true)]
         private static bool ValidatePaste() {
-            return IsInProjectWindow() && Selection.activeObject != null;
+            return IsInProjectWindow();
         }
 
         private static bool IsInProjectWindow() {
             return EditorWindow.focusedWindow != null &&
                    EditorWindow.focusedWindow.GetType().Name == "ProjectBrowser";
+        }
+
+        // Sense there is no public API to get the active folder in the Project window,
+        // we have to use reflection to get it.
+        private static string GetActiveFolderPath() {
+            var projectBrowserType = typeof(EditorWindow).Assembly.GetType("UnityEditor.ProjectBrowser");
+            if(projectBrowserType != null) {
+                EditorWindow projectBrowser = EditorWindow.GetWindow(projectBrowserType);
+                MethodInfo method = projectBrowserType.GetMethod("GetActiveFolderPath", BindingFlags.Instance | BindingFlags.NonPublic);
+                if(method != null) {
+                    string folderPath = method.Invoke(projectBrowser, null) as string;
+                    if(!string.IsNullOrEmpty(folderPath))
+                        return folderPath;
+                }
+            }
+
+            return "Assets";
         }
     }
 }
