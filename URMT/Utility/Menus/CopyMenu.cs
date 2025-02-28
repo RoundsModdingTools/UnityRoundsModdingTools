@@ -1,12 +1,10 @@
-﻿using UnityEditor;
-using UnityEngine;
-using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
+using UnityEditor;
 
 namespace URMT.Utility.Menus {
-    public static class CopySystem {
+    public static class CopyMenu {
         [MenuItem("Assets/Copy #z", false, 0)]
-        public static void Copy() {
+        private static void Copy() {
             CopyHandler.ObjectsToCopy = Selection.objects;
         }
 
@@ -16,7 +14,7 @@ namespace URMT.Utility.Menus {
         }
 
         [MenuItem("Assets/Paste #x", false, 1)]
-        public static void Paste() {
+        private static void Paste() {
             string selectionPath = AssetDatabase.GetAssetPath(Selection.activeObject);
 
             if(string.IsNullOrEmpty(selectionPath) || !AssetDatabase.IsValidFolder(selectionPath)) {
