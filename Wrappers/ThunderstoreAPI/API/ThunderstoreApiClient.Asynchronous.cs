@@ -92,6 +92,11 @@ namespace ThunderstoreAPI {
             }
         }
 
+        public async Task PublishAsync(PublishOption publishOption, string path, string token) {
+            Byte[] data = System.IO.File.ReadAllBytes(path);
+            await PublishAsync(publishOption, data, token);
+        }
+
         public async Task PublishAsync(PublishOption publishOption, Byte[] data, string token) {
             if(string.IsNullOrWhiteSpace(publishOption.AuthorName)) {
                 throw new ArgumentNullException("Author name must not be null or empty.", nameof(publishOption.AuthorName));

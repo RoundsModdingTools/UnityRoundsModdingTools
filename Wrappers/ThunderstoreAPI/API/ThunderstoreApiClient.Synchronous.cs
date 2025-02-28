@@ -26,6 +26,9 @@ namespace ThunderstoreAPI {
             return Task.Run(() => GetCategoriesAsync(community)).Result;
         }
 
+        public void Publish(PublishOption publishOption, string path, string token) {
+            Task.Run(() => PublishAsync(publishOption, path, token)).Wait();
+        }
         public void Publish(PublishOption publishOption, Byte[] data, string token) {
             Task.Run(() => PublishAsync(publishOption, data, token)).Wait();
         }
