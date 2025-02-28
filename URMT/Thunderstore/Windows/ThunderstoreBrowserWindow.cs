@@ -22,7 +22,7 @@ namespace Thunderstore.Windows {
         TopRated,
     }
 
-    internal class ThunderstoreWindow : EditorWindow {
+    internal class ThunderstoreBrowserWindow : EditorWindow {
         private const string COMMUNITY = "rounds";
 
         private static Package[] packages = new Package[0];
@@ -40,13 +40,10 @@ namespace Thunderstore.Windows {
         private Vector2 scrollPos;
 
 
-        [MenuItem("URMT/Thunderstore")]
+        [MenuItem("URMT/Thunderstore/Thunderstore Browser")]
         public static void ShowWindow() {
-            GetWindow<ThunderstoreWindow>("Thunderstore");
-        }
-
-        public void Dispose() {
-            client?.Dispose();
+            var window = GetWindow<ThunderstoreBrowserWindow>("Thunderstore Browser");
+            window.minSize = new Vector2(700, 300);
         }
 
         private async void OnEnable() {
@@ -60,7 +57,7 @@ namespace Thunderstore.Windows {
         }
 
         private void OnGUI() {
-            GUIUtils.DrawTitle("Thunderstore");
+            GUIUtils.DrawTitle("Thunderstore Browser");
             if(modList == null) CreateModList();
             SetupThunderstoreClient();
 
@@ -68,13 +65,13 @@ namespace Thunderstore.Windows {
             sortType = (PackageSortType)EditorGUILayout.EnumPopup("Sort by:", sortType);
 
             if(packages.Length == 0) {
-                EditorGUILayout.LabelField("Loading packages...");
+                EditorGUILayout.HelpBox("Loading packages...", MessageType.Info);
                 return;
             }
 
-            GUIUtils.CreateMultSelectDropdown("Whitelist Categories:", "Categories", categories.Select(category => category.Name).ToList(), selectedWhitelistedCategories);
+            GUIUtils.CreateMultSelectDropdown("Whitelist Categories:", "Categories", categories.Select(x => x.Name).ToList(), selectedWhitelistedCategories);
             GUILayout.Space(1);
-            GUIUtils.CreateMultSelectDropdown("Blacklist Categories:", "Categories", categories.Select(category => category.Name).ToList(), selectedBlacklistedCategories);
+            GUIUtils.CreateMultSelectDropdown("Blacklist Categories:", "Categories", categories.Select(x => x.Name).ToList(), selectedBlacklistedCategories);
             GUILayout.Space(5);
 
             shownPackages = GetShowenPackage();
