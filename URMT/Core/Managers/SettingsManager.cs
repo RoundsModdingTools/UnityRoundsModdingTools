@@ -20,6 +20,47 @@ namespace URMT.Core.Managers {
             SettingMenus.Add(settingMenu, true);
         }
 
+        public static void RenderSettings(ISettingMenu settingMenu) {
+            if(!SettingMenus.ContainsKey(settingMenu)) return;
+            
+            var scriptableSetting = (ScriptableObject)settingMenu;
+            SettingMenus[settingMenu] = EditorGUILayout.Foldout(SettingMenus[settingMenu], settingMenu.Name, true, EditorStyles.foldout);
+
+            if(!SettingMenus[settingMenu]) return;
+
+            EditorGUI.indentLevel++;
+            SerializedObject serializedObject = new SerializedObject(scriptableSetting);
+            serializedObject.Update();
+
+            bool hasChanges = false;
+            Type settingType = settingMenu.GetType();
+            Dictionary<string, MethodInfo> renderMethods = GetRenderMethods(settingType);
+            
+            EditorGUI.BeginChangeCheck();
+            SerializedProperty property = serializedObject.GetIterator();
+            property.NextVisible(true);
+
+            while(property.NextVisible(false)) {
+                if(renderMethods.TryGetValue(property.name, out MethodInfo method)) {
+                    method.Invoke(settingMenu, new object[] { property });
+                } else {
+                    EditorGUILayout.PropertyField(property, true);
+                }
+            }
+
+            if(EditorGUI.EndChangeCheck()) {
+                hasChanges = true;
+            }
+
+            if(hasChanges) {
+                serializedObject.ApplyModifiedProperties();
+                EditorUtility.SetDirty(scriptableSetting);
+            }
+
+            EditorGUI.indentLevel--;
+            EditorGUILayout.Space();
+        }
+
         public static void RenderSettings() {
             var keys = new List<ISettingMenu>(SettingMenus.Keys);
 
