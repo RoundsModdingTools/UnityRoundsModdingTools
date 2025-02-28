@@ -174,7 +174,9 @@ namespace URMT.Export.CustomInspectors {
             SerializedProperty includeInAllExports = serializedObject.FindProperty(nameof(ModInfo.IncludeInAllExports));
             SerializedProperty beforeBuildCommand = serializedObject.FindProperty(nameof(ModInfo.BeforeBuildCommand));
             SerializedProperty afterBuildCommand = serializedObject.FindProperty(nameof(ModInfo.AfterBuildCommand));
-             
+            SerializedProperty author = serializedObject.FindProperty(nameof(ModInfo.Author));
+
+            author.stringValue = EditorGUILayout.TextField("Author", author.stringValue);
             includeInAllExports.boolValue = EditorGUILayout.Toggle("Include In All Exports", includeInAllExports.boolValue);
             GUILayout.Space(10);
 

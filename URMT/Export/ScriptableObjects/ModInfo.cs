@@ -153,7 +153,7 @@ namespace URMT.Export.ScriptableObjects {
             }
         }
 
-        public void ExportMod() {
+        public string ExportMod() {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -223,6 +223,8 @@ namespace URMT.Export.ScriptableObjects {
 
             stopwatch.Stop();
             UnityEngine.Debug.Log($"Exported mod {ModName} in {stopwatch.ElapsedMilliseconds}ms");
+
+            return ExportPath;
         }
 
         public string GetDLLObjPath(string dllPath) {
