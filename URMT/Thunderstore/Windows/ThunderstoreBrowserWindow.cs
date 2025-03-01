@@ -192,7 +192,7 @@ namespace Thunderstore.Windows {
                             ZipFile.ExtractToDirectory(tempFilePath, tempDownloadPath);
                             string firstDirectoryPath = Directory.GetDirectories(tempDownloadPath)[0];
 
-                            ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
+                            ModManagerModule.ConvertToUnityProject(firstDirectoryPath, selectedRepo);
 
                             Directory.Delete(tempDownloadPath, true);
                         }

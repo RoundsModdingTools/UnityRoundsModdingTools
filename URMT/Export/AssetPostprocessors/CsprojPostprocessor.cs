@@ -18,6 +18,8 @@ namespace URMT.Export.AssetPostprocessors {
                 foreach(string guid in modInfoGuids) {
                     string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                     ModInfo modInfo = AssetDatabase.LoadAssetAtPath<ModInfo>(assetPath);
+
+                    if (modInfo.ModAssemblyDefinition == null) continue;
                     modInfos.Add(modInfo);
                 }
             }

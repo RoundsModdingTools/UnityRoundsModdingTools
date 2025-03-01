@@ -60,12 +60,12 @@ namespace URMT.ModManager.Windows {
                             ZipFile.ExtractToDirectory(filePath, tempPath);
                             string firstDirectoryPath = Directory.GetDirectories(tempPath)[0];
 
-                            ModManagerModule.ConvertToUnityProject(firstDirectoryPath);
+                            ModManagerModule.ConvertToUnityProject(firstDirectoryPath, selectedRepo);
 
                             Directory.Delete(tempPath, true);
                         }
                     } else {
-                        ModManagerModule.ConvertToUnityProject(modPath);
+                        ModManagerModule.ConvertToUnityProject(modPath, selectedRepo);
                     }
                 }
                 GUI.enabled = true;

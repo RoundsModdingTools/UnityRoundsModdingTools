@@ -18,18 +18,20 @@ namespace URMT.ModManager {
             LoggerUtils.Log("ModManager Module Loaded");
         }
 
-        public static void ConvertToUnityProject(string path) {
+        public static void ConvertToUnityProject(string path, string modName) {
             string[] solutionFiles = Directory.GetFiles(path, "*.sln", SearchOption.AllDirectories);
             string[] assemblyDefinitionFiles = Directory.GetFiles(path, "*.asmdef", SearchOption.AllDirectories);
-            AssemblyDefinition[] assemblyDefinitions;
+            AssemblyDefinition[] assemblyDefinitions = new AssemblyDefinition[0];
 
-            Solution solution = new Solution(solutionFiles[0]);
-            if(solutionFiles.Length > 0 && solution.Projects.Length == 1) {
-                assemblyDefinitions = solution.ConvertToAssemblyDefinitions(CoreModule.Instance.ModsFolderPath);
-            } else if(solutionFiles.Length > 0 && solution.Projects.Length > 1) {
-                assemblyDefinitions = solution.ConvertToAssemblyDefinitions(Path.Combine(CoreModule.Instance.ModsFolderPath, Path.GetFileNameWithoutExtension(solutionFiles[0])));
+            if(solutionFiles.Length > 0) {
+                Solution solution = new Solution(solutionFiles[0]);
+                if(solutionFiles.Length > 0 && solution.Projects.Length == 1) {
+                    assemblyDefinitions = solution.ConvertToAssemblyDefinitions(CoreModule.Instance.ModsFolderPath);
+                } else if(solutionFiles.Length > 0 && solution.Projects.Length > 1) {
+                    assemblyDefinitions = solution.ConvertToAssemblyDefinitions(Path.Combine(CoreModule.Instance.ModsFolderPath, Path.GetFileNameWithoutExtension(solutionFiles[0])));
+                }
             } else if(assemblyDefinitionFiles.Length > 0) {
-                FileSystemUtils.CopyDirectory(path, CoreModule.Instance.ModsFolderPath);
+                FileSystemUtils.CopyDirectory(path, Path.Combine(CoreModule.Instance.ModsFolderPath, modName));
 
                 assemblyDefinitions = new AssemblyDefinition[assemblyDefinitionFiles.Length];
                 for(int i = 0; i < assemblyDefinitionFiles.Length; i++) {

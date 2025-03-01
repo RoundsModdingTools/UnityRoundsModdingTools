@@ -10,9 +10,10 @@ namespace URMT.Core.Utils {
             blacklistedDirectory = blacklistedDirectory == null ? new string[0] : blacklistedDirectory;
             blacklistedFileExtension = blacklistedFileExtension == null ? new string[0] : blacklistedFileExtension.Select(ext => ext.Replace(".", "")).ToArray();
 
-            if(!destDir.Exists) {
-                destDir.Create();
+            if(destDir.Exists) {
+                destDir.Delete(true);
             }
+            destDir.Create();
 
             foreach(FileInfo file in sourceDir.GetFiles()) {
                 bool isBlacklisted = blacklistedFileExtension.Contains(file.Extension.Replace(".", ""));
