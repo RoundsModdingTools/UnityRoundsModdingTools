@@ -1,24 +1,23 @@
 # Unity Rounds Modding Tools
 
 **Unity Rounds Modding Tools** is a collection of tools, That help you mod a game called [ROUNDS](https://store.steampowered.com/app/1557740/ROUNDS/) within Unity
+
 ## Key Features
 
 - **Mod Installation Window**  
-  A dedicated window to install mods directly from a **GitHub URL** or a local **Solution Path**.
-
+  A dedicated window to install mods directly from a **GitHub URL** or a **Projecft Path**.
 - **Automatic Project Conversion**  
   When a mod is installed through these **Tools**, it will automatically convert the **Visual Studio (VS)** project into a **Unity-compatible** project format, If the project is a **Visual Studio (VS)** project.
-
-- **Thunderstore Window**  
+- **Thunderstore Browser Window**  
   A dedicated window for installing mods directly from [Thunderstore](https://thunderstore.io/c/rounds/) if the mod’s **Thunderstore page** includes a GitHub link.
-  
 - **Create Mod Window**  
   The `Create Mod` window setup the boilerplate code automatically, providing a quick starting point for new mod development.
-  
+- **Auto Export**
+  Automatically exports your mod when you build a mod with the `ModInfo` scriptable object. If the `Export Folder Copy To` is set, it also automatically copie the folder to the specified location.
+
 ## Installation
 
 1. **Download the Unity Package**  
    Visit the [releases page](https://github.com/AALUND13/UnityRoundsModdingTools/releases) to download the latest `.unitypackage` file.
-
 2. **Install the Package**  
-   Once downloaded, double-click the `.unitypackage` file to install it directly into your Unity project. 
+   Once downloaded, double-click the `.unitypackage` file to install it directly into your Unity project.
