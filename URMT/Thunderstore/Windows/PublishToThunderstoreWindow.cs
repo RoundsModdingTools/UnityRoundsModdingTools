@@ -43,7 +43,7 @@ namespace URMT.Thunderstore.Windows {
             SetupThunderstoreClient();
 
             GUIUtils.DrawTitle("Publish to Thunderstore");
-            EditorGUILayout.HelpBox("Note: This is never tested, It might not work.", MessageType.Warning);
+            EditorGUILayout.HelpBox("Note: This feature was never tested, It may not work\nUse at your own risk.", MessageType.Warning);
 
             if(categories.Length == 0) {
                 EditorGUILayout.HelpBox("Loading categories...", MessageType.Info);

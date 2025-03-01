@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
@@ -18,7 +20,9 @@ namespace URMT.General {
 
 
         public List<ModBundleMapping> ModBundleMappings = new List<ModBundleMapping>();
-        public List<FolderMapping> FolderMappings = new List<FolderMapping>() {
+        public List<FolderMapping> FolderMappings = new List<FolderMapping>(GetURMTFolderMappings()) {
+            new FolderMapping("ThunderstoreAPI", "URMT Wrappers"),
+            new FolderMapping("GithubAPI", "URMT Wrappers"),
             new FolderMapping("CardChoiceSpawnUniqueCardPatch", "Libraries"),
             new FolderMapping("CardThemeLib", "Libraries"),
             new FolderMapping("ClassesManagerReborn", "Libraries"),
@@ -32,6 +36,16 @@ namespace URMT.General {
             new FolderMapping("WillsWackyManagers", "Libraries"),
             new FolderMapping("ILGenerator", "Libraries"),
         };
+
+        private static List<FolderMapping> GetURMTFolderMappings() {
+            // Get all assemblies that are in the URMT namespace
+            var urmtAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(assembly => assembly.FullName.Contains("URMT"))
+                .Select(assembly => assembly.GetName().Name)
+                .ToList();
+
+            return urmtAssemblies.Select(assembly => new FolderMapping(assembly, "URMT")).ToList();
+        }
 
         public void OnEnable() {
             var serializedObject = new SerializedObject(this);

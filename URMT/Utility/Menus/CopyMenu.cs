@@ -55,6 +55,7 @@ namespace URMT.Utility.Menus {
                         return folderPath;
                 }
             }
+            
 
             return "Assets";
         }
