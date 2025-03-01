@@ -4,10 +4,11 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using URMT.Core.Settings;
+using URMT.Core.Utils;
 
 namespace URMT.Core.Managers {
     public static class SettingsManager {
-        private static readonly Dictionary<ISettingMenu, bool> SettingMenus = new Dictionary<ISettingMenu, bool>();
+        private static readonly Dictionary<ISettingMenu, SaveableProperty<bool>> SettingMenus = new Dictionary<ISettingMenu, SaveableProperty<bool>>();
 
         public static void RegisterSettingMenu(ISettingMenu settingMenu) {
             if(settingMenu == null)
@@ -17,16 +18,16 @@ namespace URMT.Core.Managers {
             if(SettingMenus.ContainsKey(settingMenu))
                 throw new ArgumentException("Setting menu already registered", nameof(settingMenu));
 
-            SettingMenus.Add(settingMenu, true);
+            SettingMenus.Add(settingMenu, new SaveableProperty<bool>($"URMT_{settingMenu.Name.Replace(" ", "_")}_Foldout", true));
         }
 
         public static void RenderSettings(ISettingMenu settingMenu) {
             if(!SettingMenus.ContainsKey(settingMenu)) return;
             
             var scriptableSetting = (ScriptableObject)settingMenu;
-            SettingMenus[settingMenu] = EditorGUILayout.Foldout(SettingMenus[settingMenu], settingMenu.Name, true, EditorStyles.foldout);
+            SettingMenus[settingMenu].Value = EditorGUILayout.Foldout(SettingMenus[settingMenu].Value, settingMenu.Name, true, EditorStyles.foldout);
 
-            if(!SettingMenus[settingMenu]) return;
+            if(!SettingMenus[settingMenu].Value) return;
 
             EditorGUI.indentLevel++;
             SerializedObject serializedObject = new SerializedObject(scriptableSetting);
@@ -68,9 +69,9 @@ namespace URMT.Core.Managers {
                 if(!SettingMenus.ContainsKey(key)) continue;
 
                 var scriptableSetting = (ScriptableObject)key;
-                SettingMenus[key] = EditorGUILayout.Foldout(SettingMenus[key], key.Name, true, EditorStyles.foldout);
+                SettingMenus[key].Value = EditorGUILayout.Foldout(SettingMenus[key].Value, key.Name, true, EditorStyles.foldout);
 
-                if(!SettingMenus[key]) continue;
+                if(!SettingMenus[key].Value) continue;
 
                 EditorGUI.indentLevel++;
                 SerializedObject serializedObject = new SerializedObject(scriptableSetting);
