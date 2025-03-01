@@ -34,6 +34,17 @@ namespace URMT.Export.ScriptableObjects {
         public List<string> DllDependencies = new List<string>();
         public List<string> AssemblyDefinitionDependencies = new List<string>();
 
+        public Texture2D Icon {
+            get {
+                string iconPath = Path.Combine(AssetDatabase.GetAssetPath(this), "icon.png");
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(iconPath);
+            }
+        }
+
+        public bool HasReadme => File.Exists(Path.Combine(AssetDatabase.GetAssetPath(this), "README.md"));
+        public bool HasIcon => File.Exists(Path.Combine(AssetDatabase.GetAssetPath(this), "icon.png"));
+        public bool HasChangelog => File.Exists(Path.Combine(AssetDatabase.GetAssetPath(this), "CHANGELOG.md"));
+
         public bool IncludeInAllExports = true;
 
         public AssemblyDefinition ModAssemblyDefinition {

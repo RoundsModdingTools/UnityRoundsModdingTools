@@ -124,6 +124,12 @@ namespace URMT.Thunderstore.Windows {
             } else if(modInfo.Description.Length > 250) {
                 EditorGUILayout.HelpBox("Description is too long, it must be less than 250 characters", MessageType.Error);
                 return false;
+            } else if(modInfo.HasReadme) {
+                EditorGUILayout.HelpBox("Please include a README.md file in the mod's root folder", MessageType.Error);
+                return false;
+            } else if(modInfo.Icon == null || modInfo.Icon.width != 256 || modInfo.Icon.height != 256) {
+                EditorGUILayout.HelpBox("Please include a 256x256 icon in the mod's root folder", MessageType.Error);
+                return false;
             } else if(modInfo.Version.Split('.').Length != 3) {
                 EditorGUILayout.HelpBox("Version must be in the format of x.x.x", MessageType.Error);
                 return false;
