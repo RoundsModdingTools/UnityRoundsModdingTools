@@ -7,6 +7,7 @@ using ThunderstoreAPI.Entities;
 using UnityEditor;
 using UnityEngine;
 using URMT.Core.UI;
+using URMT.Core.Utils;
 using URMT.Export.ScriptableObjects;
 
 namespace URMT.Thunderstore.Windows {
@@ -33,6 +34,7 @@ namespace URMT.Thunderstore.Windows {
         }
 
         private async void OnEnable() {
+            SetupThunderstoreClient();
             await GetCategories();
 
             isPublishSuccessful = false;
@@ -43,7 +45,6 @@ namespace URMT.Thunderstore.Windows {
             SetupThunderstoreClient();
 
             GUIUtils.DrawTitle("Publish to Thunderstore");
-            EditorGUILayout.HelpBox("Note: This feature was never tested, It may not work\nUse at your own risk.", MessageType.Warning);
 
             if(categories.Length == 0) {
                 EditorGUILayout.HelpBox("Loading categories...", MessageType.Info);
@@ -66,6 +67,7 @@ namespace URMT.Thunderstore.Windows {
                     : null;
 
                 PublishOption publishOption = new PublishOption(modInfo.Author, selectedCategoriesNames, NSFWContent, COMMUNITY);
+
 
                 if(!ValidateModInfo()) {
                     GUI.enabled = false;
@@ -99,7 +101,7 @@ namespace URMT.Thunderstore.Windows {
         }
 
         public async Task PublishMod(PublishOption publishOption) {
-            string exportPath = modInfo.ExportMod();
+            string exportPath = await MainThreadAction.InvokeAsync(() => modInfo.ExportMod());
             try {
                 await client.PublishAsync(publishOption, $"{exportPath}.zip", ThunderstoreModuleSettings.ThunderstoreAPITokenRegistry);
                 isPublishSuccessful = true;
@@ -107,7 +109,7 @@ namespace URMT.Thunderstore.Windows {
             } catch(Exception e) {
                 ErrorMessage = e.Message;
             }
-
+            
             isPublishing = false;
         }
 

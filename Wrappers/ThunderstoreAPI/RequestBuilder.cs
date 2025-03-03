@@ -7,18 +7,21 @@ namespace ThunderstoreAPI {
         private UriBuilder uriBuilder = new UriBuilder() {
             Scheme = "https"
         };
+
         public HttpMethod Method = HttpMethod.Get;
         public AuthenticationHeaderValue Authorization;
         public HttpContent Content;
-
+        public string Host { get; private set; }
         public RequestBuilder(string host) {
             uriBuilder.Host = host.StartsWith("https://")
                 ? host.Substring(8)
                 : host;
+
+            Host = host;
         }
 
         public RequestBuilder StartNew() {
-            return new RequestBuilder(uriBuilder.Uri.Host);
+            return new RequestBuilder(Host);
         }
 
         public RequestBuilder WithEndpoint(string endpoint) {
@@ -28,6 +31,12 @@ namespace ThunderstoreAPI {
 
             return this;
         }
+
+        public RequestBuilder WithAbsoluteEndpoint(string absoluteUrl) {
+            uriBuilder = new UriBuilder(absoluteUrl);
+            return this;
+        }
+
 
         public RequestBuilder WithAuth(AuthenticationHeaderValue authorization) {
             Authorization = authorization;

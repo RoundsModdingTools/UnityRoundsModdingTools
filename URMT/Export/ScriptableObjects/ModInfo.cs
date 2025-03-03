@@ -36,7 +36,8 @@ namespace URMT.Export.ScriptableObjects {
 
         public Texture2D Icon {
             get {
-                string iconPath = Path.Combine(AssetDatabase.GetAssetPath(this), "icon.png");
+                string assetPath = AssetDatabase.GetAssetPath(this);
+                string iconPath = Path.Combine(Path.GetDirectoryName(assetPath), "icon.png");
                 return AssetDatabase.LoadAssetAtPath<Texture2D>(iconPath);
             }
         }

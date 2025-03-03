@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -94,41 +96,38 @@ namespace ThunderstoreAPI {
 
         public async Task PublishAsync(PublishOption publishOption, string path, string token) {
             Byte[] data = System.IO.File.ReadAllBytes(path);
-            await PublishAsync(publishOption, data, token);
+            await PublishAsync(publishOption, data, Path.GetFileName(path), token);
         }
 
-        public async Task PublishAsync(PublishOption publishOption, Byte[] data, string token) {
+        public async Task PublishAsync(PublishOption publishOption, Byte[] data, string fileName, string token) {
             if(string.IsNullOrWhiteSpace(publishOption.AuthorName)) {
                 throw new ArgumentNullException("Author name must not be null or empty.", nameof(publishOption.AuthorName));
             } else if(publishOption.Communities == null || publishOption.Communities.Length == 0) {
                 throw new ArgumentNullException("Communities must not be null or empty.", nameof(publishOption.Communities));
             }
 
-            var uploadResponse = await InitiateUploadAsync(publishOption.AuthorName, data.Length, token);
+            var uploadResponse = await InitiateUploadAsync(fileName, data.LongLength, token);
 
             Guid uuid = uploadResponse.UserMedia.UUID;
 
             // Upload the data in parallel
-            var tasks = new List<Task>();
-            foreach(var part in uploadResponse.UploadUrls) {
-                tasks.Add(Task.Run(() => UploadChuckAsync(part, data)));
-            }
+            var uploadTasks = uploadResponse.UploadUrls
+                .Select(part => UploadChuckAsync(part, data))
+                .ToList();
 
-
-            List<CompletedPart> parts;
+            CompletedPart[] parts;
             try {
-                await Task.WhenAll(tasks);
-                parts = tasks.Select(t => ((Task<CompletedPart>)t).Result).ToList();
+                parts = await Task.WhenAll(uploadTasks);
             } catch(Exception ex) {
                 _ = Task.Run(() => AbortUploadAsync(uuid, token));
                 throw new Exception("Failed to upload file", ex);
             }
 
             await FinishUploadAsync(parts, uuid, token);
-            await SubmitPackageAsync(uuid, publishOption);
+            await SubmitPackageAsync(uuid, publishOption, token);
         }
 
-        private async Task<UserMediaInitiateUploadResponse> InitiateUploadAsync(string filename, int fileSizeBytes, string token) {
+        private async Task<UserMediaInitiateUploadResponse> InitiateUploadAsync(string filename, long fileSizeBytes, string token) {
             var request = requestBuilder
                 .StartNew()
                 .WithEndpoint("/api/experimental/usermedia/initiate-upload/")
@@ -136,7 +135,7 @@ namespace ThunderstoreAPI {
                 .WithMethod(HttpMethod.Post)
                 .WithContent(new StringContent(JsonConvert.SerializeObject(new {
                     filename,
-                    fileSizeBytes,
+                    file_size_bytes = fileSizeBytes, // Changed to file_size_bytes
                 }), Encoding.UTF8, "application/json"))
                 .Build();
 
@@ -159,13 +158,17 @@ namespace ThunderstoreAPI {
 
             var request = requestBuilder
                 .StartNew()
-                .WithEndpoint(part.Url.ToString())
+                .WithAbsoluteEndpoint(part.Url.ToString())
                 .WithMethod(HttpMethod.Put)
                 .WithContent(new ByteArrayContent(chunk))
                 .WithContentType("application/octet-stream")
                 .Build();
 
             using(var response = await client.SendAsync(request)) {
+                if(!response.IsSuccessStatusCode) {
+                    throw new InvalidOperationException($"Upload failed with status code {response.StatusCode}");
+                }
+
                 if(response.Headers.TryGetValues("ETag", out var values)) {
                     var eTag = values.FirstOrDefault();
                     if(eTag != null) {
@@ -176,14 +179,14 @@ namespace ThunderstoreAPI {
                     }
                 }
             }
-
             throw new InvalidOperationException("ETag not found in the response.");
+
         }
 
-        private async Task FinishUploadAsync(List<CompletedPart> completedParts, Guid uuid, string token) {
+        private async Task FinishUploadAsync(CompletedPart[] completedParts, Guid uuid, string token) {
             var request = requestBuilder
                 .StartNew()
-                .WithEndpoint($"{THUNDERSTORE_API_URL}/api​/experimental​/usermedia​/{uuid}​/finish-upload​")
+                .WithEndpoint($"/api/experimental/usermedia/{uuid}/finish-upload")
                 .WithAuth(new AuthenticationHeaderValue("Bearer", token))
                 .WithMethod(HttpMethod.Post)
                 .WithContent(new StringContent(JsonConvert.SerializeObject(new {
@@ -199,7 +202,7 @@ namespace ThunderstoreAPI {
         private async Task AbortUploadAsync(Guid uuid, string token) {
             var request = requestBuilder
                 .StartNew()
-                .WithEndpoint($"{THUNDERSTORE_API_URL}/api​/experimental​/usermedia​/{uuid}​/abort-upload​")
+                .WithEndpoint($"/api​/experimental​/usermedia​/{uuid}​/abort-upload​")
                 .WithAuth(new AuthenticationHeaderValue("Bearer", token))
                 .WithMethod(HttpMethod.Post)
                 .WithContent(new StringContent(JsonConvert.SerializeObject(uuid),
@@ -213,7 +216,7 @@ namespace ThunderstoreAPI {
             }
         }
 
-        private async Task SubmitPackageAsync(Guid uuid, PublishOption publishOption) {
+        private async Task SubmitPackageAsync(Guid uuid, PublishOption publishOption, string token) {
             var metadata = new PackageSubmissionMetadata {
                 AuthorName = publishOption.AuthorName,
                 Categories = publishOption.Categories,
@@ -226,6 +229,7 @@ namespace ThunderstoreAPI {
             var request = requestBuilder
                 .StartNew()
                 .WithEndpoint("/api/experimental/submission/submit")
+                .WithAuth(new AuthenticationHeaderValue("Bearer", token))
                 .WithMethod(HttpMethod.Post)
                 .WithContent(new StringContent(JsonConvert.SerializeObject(metadata), Encoding.UTF8, "application/json"))
                 .Build();
