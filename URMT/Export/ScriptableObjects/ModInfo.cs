@@ -224,9 +224,7 @@ namespace URMT.Export.ScriptableObjects {
             ZipFile.CreateFromDirectory(ExportPath, $"{ExportPath}.zip");
 
             if(!string.IsNullOrWhiteSpace(ExportModuleSettings.Instance.ExportFolderCopyTo) && Directory.Exists(ExportModuleSettings.Instance.ExportFolderCopyTo)) {
-                string author = string.IsNullOrWhiteSpace(Author) ? "Unknown" : Author;
-
-                string copyToPath = Path.Combine(ExportModuleSettings.Instance.ExportFolderCopyTo, $"{author}-{ModName}");
+                string copyToPath = Path.Combine(ExportModuleSettings.Instance.ExportFolderCopyTo, $"unknow-{ModName}");
                 if(Directory.Exists(copyToPath)) Directory.Delete(copyToPath, true);
 
                 // Copy the folder to the specified path
