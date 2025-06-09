@@ -102,12 +102,21 @@ namespace URMT.Export.ScriptableObjects {
 
         public void GenerateScripts() {
             if(ModAssemblyDefinition == null) return;
+            else if(!Application.platform.ToString().Contains("Windows")) {
+                UnityEngine.Debug.LogWarning($"Powershell scripts are only supported on Windows. Platform: {Application.platform}");
+                return;
+            }
 
             BeforeBuildPowerShell.GenerateScript();
             AfterBuildPowerShell.GenerateScript();
         }
 
         public static void GenerateAllScripts() {
+            if (!Application.platform.ToString().Contains("Windows")) {
+                UnityEngine.Debug.LogWarning($"Powershell scripts are only supported on Windows. Platform: {Application.platform}");
+                return;
+            }
+
             string[] modInfoGuids = AssetDatabase.FindAssets("t:ModInfo");
             List<ModInfo> modInfos = new List<ModInfo>();
             foreach(string guid in modInfoGuids) {
