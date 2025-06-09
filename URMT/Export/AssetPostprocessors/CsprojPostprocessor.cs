@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using URMT.Core.Utils;
 using URMT.Export.ScriptableObjects;
 
 namespace URMT.Export.AssetPostprocessors {
@@ -9,6 +10,11 @@ namespace URMT.Export.AssetPostprocessors {
         private static List<ModInfo> modInfos = null;
 
         public static string OnGeneratedCSProject(string path, string content) {
+            if(!Application.platform.ToString().Contains("Windows")) {
+                LoggerUtils.LogWarning($"Powershell scripts are only supported on Windows. Platform: {Application.platform}");
+                return content;
+            }
+
             string[] lines = content.Split('\n');
             List<string> newLines = lines.ToList();
 

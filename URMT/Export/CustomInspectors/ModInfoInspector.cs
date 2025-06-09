@@ -197,13 +197,15 @@ namespace URMT.Export.CustomInspectors {
             string readmePath = Path.Combine(modDirectory, "README.md");
             string iconPath = Path.Combine(modDirectory, "icon.png");
 
+            if (!Application.platform.ToString().Contains("Windows")) {
+                EditorGUILayout.HelpBox("PowerShell scripts are only supported on Windows. These scripts will not run on other platforms.", MessageType.Warning);
+            }
             if(!File.Exists(readmePath)) {
                 EditorGUILayout.HelpBox("README file not found. Recommend creating one.", MessageType.Warning);
             }
             if(!File.Exists(iconPath)) {
                 EditorGUILayout.HelpBox("Icon file not found. Recommend creating one.", MessageType.Warning);
             }
-
 
             if(GUILayout.Button("Export") && !string.IsNullOrWhiteSpace(modName.stringValue)) {
                 modInfo.ExportMod();
