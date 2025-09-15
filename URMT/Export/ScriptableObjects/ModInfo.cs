@@ -34,17 +34,11 @@ namespace URMT.Export.ScriptableObjects {
         public List<string> DllDependencies = new List<string>();
         public List<string> AssemblyDefinitionDependencies = new List<string>();
 
-        public Texture2D Icon {
-            get {
-                string assetPath = AssetDatabase.GetAssetPath(this);
-                string iconPath = Path.Combine(Path.GetDirectoryName(assetPath), "icon.png");
-                return AssetDatabase.LoadAssetAtPath<Texture2D>(iconPath);
-            }
-        }
+        public Texture2D Icon;
 
-        public bool HasReadme => File.Exists(Path.Combine(AssetDatabase.GetAssetPath(this), "README.md"));
-        public bool HasIcon => File.Exists(Path.Combine(AssetDatabase.GetAssetPath(this), "icon.png"));
-        public bool HasChangelog => File.Exists(Path.Combine(AssetDatabase.GetAssetPath(this), "CHANGELOG.md"));
+        public bool HasReadme => File.Exists(Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(this)), "README.md"));
+        public bool HasIcon => Icon != null && AssetDatabase.GetAssetPath(Icon).EndsWith(".png", StringComparison.OrdinalIgnoreCase);
+        public bool HasChangelog => File.Exists(Path.Combine(Path.GetDirectoryName(AssetDatabase.GetAssetPath(this)), "CHANGELOG.md"));
 
         public bool IncludeInAllExports = true;
 
@@ -182,7 +176,6 @@ namespace URMT.Export.ScriptableObjects {
             string ExportPath = Path.Combine(ExportModuleSettings.Instance.ExportPath, ModName);
 
             string readmePath = Path.Combine(modDirectory, "README.md");
-            string iconPath = Path.Combine(modDirectory, "icon.png");
             string changelogPath = Path.Combine(modDirectory, "CHANGELOG.md");
 
             if(Directory.Exists(ExportPath)) Directory.Delete(ExportPath, true);
@@ -206,9 +199,9 @@ namespace URMT.Export.ScriptableObjects {
                 File.Copy(DllObjPath, Path.Combine(ExportPath, "plugins", Path.GetFileName(DllObjPath)));
             }
 
-            if(File.Exists(readmePath)) File.Copy(readmePath, Path.Combine(ExportPath, "README.md"));
-            if(File.Exists(iconPath)) File.Copy(iconPath, Path.Combine(ExportPath, "icon.png"));
-            if(File.Exists(changelogPath)) File.Copy(changelogPath, Path.Combine(ExportPath, "CHANGELOG.md"));
+            if(HasReadme) File.Copy(readmePath, Path.Combine(ExportPath, "README.md"));
+            if(HasIcon) File.Copy(AssetDatabase.GetAssetPath(Icon), Path.Combine(ExportPath, "icon.png"));
+            if(HasChangelog) File.Copy(changelogPath, Path.Combine(ExportPath, "CHANGELOG.md"));
 
             if(DllDependencies != null && DllDependencies.Count > 0) {
                 Directory.CreateDirectory(Path.Combine(ExportPath, "dependencies"));

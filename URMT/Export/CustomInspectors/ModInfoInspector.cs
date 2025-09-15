@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -140,11 +141,19 @@ namespace URMT.Export.CustomInspectors {
             SerializedProperty includeInAllExports = serializedObject.FindProperty(nameof(ModInfo.IncludeInAllExports));
             SerializedProperty beforeBuildCommand = serializedObject.FindProperty(nameof(ModInfo.BeforeBuildCommand));
             SerializedProperty afterBuildCommand = serializedObject.FindProperty(nameof(ModInfo.AfterBuildCommand));
+            SerializedProperty iconTextureProp = serializedObject.FindProperty(nameof(ModInfo.Icon));
 
-            string[] MajorMinorPatch = version.stringValue.Split('.');
+            EditorGUILayout.PropertyField(iconTextureProp);
+            if(iconTextureProp != null) {
+                string path = AssetDatabase.GetAssetPath(iconTextureProp.objectReferenceValue);
+                if(!path.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) {
+                    EditorGUILayout.HelpBox("Assigned texture must be a PNG file (.png).", MessageType.Error);
+                }
+            }
             modName.stringValue = EditorGUILayout.TextField("Mod Name", modName.stringValue);
 
             // Version Field (Editable major, minor, patch parts)
+            string[] MajorMinorPatch = version.stringValue.Split('.');
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Version", GUILayout.Width(60));
             GUILayout.FlexibleSpace();
@@ -200,10 +209,10 @@ namespace URMT.Export.CustomInspectors {
             if (!Application.platform.ToString().Contains("Windows")) {
                 EditorGUILayout.HelpBox("PowerShell scripts are only supported on Windows. These scripts will not run on other platforms.", MessageType.Warning);
             }
-            if(!File.Exists(readmePath)) {
+            if(!modInfo.HasReadme) {
                 EditorGUILayout.HelpBox("README file not found. Recommend creating one.", MessageType.Warning);
             }
-            if(!File.Exists(iconPath)) {
+            if(!modInfo.HasIcon) {
                 EditorGUILayout.HelpBox("Icon file not found. Recommend creating one.", MessageType.Warning);
             }
 
