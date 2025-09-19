@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using URMT.General.Entities;
 
@@ -19,24 +20,22 @@ namespace URMT.General.AssetPostprocessors {
         public static string OnGeneratedCSProject(string path, string content) {
             if(File.Exists("Assets/Editor/CsprojPostprocessor.cs")) return content;
 
-            foreach(var mod in ModBundleMap.Select(projectMapping => projectMapping.ModName)) {
-                if(path.EndsWith($"{mod}.csproj")) {
-                    string newContent = "";
-                    bool Added = false;
-                    var lines = content.Split('\n');
-                    foreach(var line in lines) {
-                        if(!Added && line.Contains("<Compile Include=")) {
-                            int index = ModBundleMap.FindIndex(folder => folder.ModName == mod);
-                            newContent += $"     <EmbeddedResource Include=\"Assets\\AssetBundles\\{ModBundleMap[index].AssetBundleName}\" />\n";
-                            Added = true;
-                        }
+            StringBuilder newContent = new StringBuilder();
+            var lines = content.Split('\n');
 
-                        newContent += line + "\n";
+            bool Added = false;
+            foreach(var line in lines) {
+                newContent.AppendLine(line);
+                
+                if(!Added && line.Contains("<Compile Include=")) {
+                    foreach(var mod in ModBundleMap.Where(projectMapping => path.EndsWith($"{projectMapping.ModName}.csproj"))) {
+                        newContent.AppendLine($"     <EmbeddedResource Include=\"Assets\\AssetBundles\\{mod.AssetBundleName}\" />");
+                        Added = true;
                     }
-                    return newContent;
                 }
             }
-            return content;
+
+            return newContent.ToString();
         }
 
         public static string OnGeneratedSlnSolution(string path, string content) {
