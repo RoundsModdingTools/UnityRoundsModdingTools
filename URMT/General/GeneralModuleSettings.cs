@@ -102,11 +102,8 @@ namespace URMT.General {
                 GUIUtils.DrawAssemblyDefinitionProperty(modNameProperty, rect, rect.width / 2 - 10);
 
                 // AssetBundleName field
-                EditorGUI.PropertyField(
-                    new Rect(rect.x + halfWidth + 10, rect.y, halfWidth, EditorGUIUtility.singleLineHeight),
-                    element.FindPropertyRelative("AssetBundleName"),
-                    new GUIContent("Asset Bundle Name")
-                );
+                SerializedProperty modAssetProperty = element.FindPropertyRelative("AssetBundleName");
+                GUIUtils.DrawAssetBundleProperty(modAssetProperty, new Rect(rect.x + halfWidth + 10, rect.y, halfWidth, EditorGUIUtility.singleLineHeight));
 
                 projectMappingsProperty.serializedObject.ApplyModifiedProperties();
             };

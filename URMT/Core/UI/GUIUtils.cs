@@ -71,6 +71,23 @@ namespace URMT.Core.UI {
             }
         }
 
+
+        public static void DrawAssetBundleProperty(SerializedProperty property, Rect rect) {
+            string assetName = property.stringValue;
+
+            string[] options = AssetDatabase.GetAllAssetBundleNames();
+            if(!options.Contains(assetName)) {
+                options = options.Append(String.IsNullOrWhiteSpace(property.stringValue) ? "None" : assetName).ToArray();
+            }
+
+            int selectedIndex = options.ToList().FindIndex(o => o == (String.IsNullOrWhiteSpace(property.stringValue) ? "None" : assetName));
+            int selected = EditorGUI.Popup(rect, "Assets Bundle", selectedIndex, options);
+
+            if(options[selectedIndex] != options[selected]) {
+                property.stringValue = options[selected];
+            }
+        }
+
         public static void DrawTitle(string text) {
             GUILayout.Space(10);
 
