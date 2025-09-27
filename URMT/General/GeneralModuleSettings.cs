@@ -22,7 +22,7 @@ namespace URMT.General {
         public List<ModBundleMapping> ModBundleMappings = new List<ModBundleMapping>();
         public List<FolderMapping> FolderMappings = new List<FolderMapping>(GetURMTFolderMappings()) {
             new FolderMapping("ThunderstoreAPI", "URMT Wrappers"),
-            new FolderMapping("GithubAPI", "URMT Wrappers"),
+            new FolderMapping("GitHubAPI", "URMT Wrappers"),
             new FolderMapping("CardChoiceSpawnUniqueCardPatch", "Libraries"),
             new FolderMapping("CardThemeLib", "Libraries"),
             new FolderMapping("ClassesManagerReborn", "Libraries"),
